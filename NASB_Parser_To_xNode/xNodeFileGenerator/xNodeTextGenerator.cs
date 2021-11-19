@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -60,63 +60,72 @@ namespace NASB_Parser_To_xNode
             AddToFileContents("namespace NASB_Moveset_Editor");
             OpenBlock();
             {
-                AddToFileContents("[Serializable]");
-                AddToFileContents($"public {(nasbParserFile.isAbstract ? "abstract " : "")}class {className}Node : {nasbParserFile.parentClass}Node");
-                OpenBlock();
-                {
-                    // Variables
-                    foreach (VariableObj variableObj in nasbParserFile.variables)
-                    {
-                        //var accString = Utils.GetAccessabilityLevelString(variableObj.accessability);
-                        var accString = "public";
-                        if (basicTypes.Contains(variableObj.variableType))
-                        {
-                            AddToFileContents($"{accString} {variableObj.variableType} {variableObj.name};");
-                        } else if (nasbParserFile.enums.Any(x => x.name.Equals(variableObj.variableType)))
-                        {
-                            // Type is an enum contained within the class
-                            AddToFileContents($"{accString} {variableObj.variableType} {variableObj.name};");
-                        } else if (variableObj.variableType.Equals("Vector3"))
-                        {
-                            // Special case for Vector3 collision with NASB_Parser
-                            AddToFileContents($"{accString} UnityEngine.Vector3 {variableObj.name};");
-                        } else
-                        {
-                            AddToFileContents($"[Output] public {variableObj.variableType} {variableObj.name};");
-                        }
-                    }
-
-                    // Enums
-                    foreach (EnumObj enumObj in nasbParserFile.enums)
-                    {
-                        AddToFileContents("");
-                        var accString = Utils.GetAccessabilityLevelString(enumObj.accessability);
-                        AddToFileContents($"{accString} enum {enumObj.name}");
-                        OpenBlock();
-                        {
-                            foreach (string enumName in enumObj.enumNames)
-                            {
-                                AddToFileContents($"{enumName},");
-                            }
-                        }
-                        CloseBlock();
-                    }
-
-                    AddToFileContents("");
-                    AddToFileContents("protected override void Init()");
-                    OpenBlock();
-                    {
-                        AddToFileContents("base.Init();");
-                        if (Consts.classToTypeId.ContainsKey(className))
-                            AddToFileContents($"TID = TypeId.{Consts.classToTypeId[className]};");
-                    }
-                    CloseBlock();
-                }
-                CloseBlock();
+                HandleClass(className, nasbParserFile);
             }
             CloseBlock();
 
             return fileContents;
+        }
+
+        private static void HandleClass(string className, NASBParserFile nasbParserFile)
+        {
+            AddToFileContents("[Serializable]");
+            AddToFileContents($"public {(nasbParserFile.isAbstract ? "abstract " : "")}class {className}Node : {nasbParserFile.parentClass}Node");
+            OpenBlock();
+            {
+                // Variables
+                foreach (VariableObj variableObj in nasbParserFile.variables)
+                {
+                    //var accString = Utils.GetAccessabilityLevelString(variableObj.accessability);
+                    var accString = "public";
+                    if (basicTypes.Contains(variableObj.variableType))
+                    {
+                        AddToFileContents($"{accString} {variableObj.variableType} {variableObj.name};");
+                    }
+                    else if (nasbParserFile.enums.Any(x => x.name.Equals(variableObj.variableType)))
+                    {
+                        // Type is an enum contained within the class
+                        AddToFileContents($"{accString} {variableObj.variableType} {variableObj.name};");
+                    }
+                    else if (variableObj.variableType.Equals("Vector3"))
+                    {
+                        // Special case for Vector3 collision with NASB_Parser
+                        AddToFileContents($"{accString} UnityEngine.Vector3 {variableObj.name};");
+                    }
+                    else
+                    {
+                        AddToFileContents($"[Output] public {variableObj.variableType} {variableObj.name};");
+                    }
+                }
+
+                // Enums
+                foreach (EnumObj enumObj in nasbParserFile.enums)
+                {
+                    AddToFileContents("");
+                    var accString = Utils.GetAccessabilityLevelString(enumObj.accessability);
+                    AddToFileContents($"{accString} enum {enumObj.name}");
+                    OpenBlock();
+                    {
+                        foreach (string enumName in enumObj.enumNames)
+                        {
+                            AddToFileContents($"{enumName},");
+                        }
+                    }
+                    CloseBlock();
+                }
+
+                // Init function
+                AddToFileContents("");
+                AddToFileContents("protected override void Init()");
+                OpenBlock();
+                {
+                    AddToFileContents("base.Init();");
+                    if (Consts.classToTypeId.ContainsKey(className))
+                        AddToFileContents($"TID = TypeId.{Consts.classToTypeId[className]};");
+                }
+                CloseBlock();
+            }
+            CloseBlock();
         }
 
         private static void AddToFileContents(string line)
