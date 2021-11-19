@@ -4,7 +4,7 @@ using System.Text;
 
 namespace NASB_Parser_To_xNode
 {
-    class NASBParserFolder
+    public class NASBParserFolder
     {
         public string folderName;
         public string sourceClass;

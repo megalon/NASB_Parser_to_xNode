@@ -30,16 +30,8 @@ namespace NASB_Parser_To_xNode
 
         private static void LoadAllNASBClasses(string mainPath)
         {
-            NASBParserFolder[] folders = {
-                new NASBParserFolder("FloatSources", "FloatSource"),
-                new NASBParserFolder("Jumps", "Jump"),
-                new NASBParserFolder("CheckThings", "CheckThing"),
-                new NASBParserFolder("StateActions", "StateAction"),
-                new NASBParserFolder("ObjectSources", "ObjectSource")
-            };
-
             nasbParserFiles = new List<NASBParserFile>();
-            foreach (NASBParserFolder folder in folders)
+            foreach (NASBParserFolder folder in Consts.folders)
             {
                 string inputDir = Path.Combine(mainPath, folder.folderName);
                 var filePaths = Directory.GetFiles(inputDir);

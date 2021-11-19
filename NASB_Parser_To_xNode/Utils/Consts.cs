@@ -35,6 +35,14 @@ namespace NASB_Parser_To_xNode
             }
         }
 
+        public static NASBParserFolder[] folders = {
+            new NASBParserFolder("FloatSources", "FloatSource"),
+            new NASBParserFolder("Jumps", "Jump"),
+            new NASBParserFolder("CheckThings", "CheckThing"),
+            new NASBParserFolder("StateActions", "StateAction"),
+            new NASBParserFolder("ObjectSources", "ObjectSource")
+        };
+
         public static List<string> looseFiles = new List<string>{ "AgentState", "IdState", "TimedAction", "SerialMoveset", "TimedAction" };
 
         public static Dictionary<string, string> classesToNamespaces = new Dictionary<string, string> {
