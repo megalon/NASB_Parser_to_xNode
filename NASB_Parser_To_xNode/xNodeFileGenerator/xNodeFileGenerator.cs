@@ -30,7 +30,7 @@ namespace NASB_Parser_To_xNode
             {
                 foreach (string line in fileText.Split('\n'))
                 {
-                    sw.WriteLine(line + "\n");
+                    sw.WriteLine(line);
                 }
             }
         }
