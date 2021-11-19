@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -44,10 +44,14 @@ namespace NASB_Parser_To_xNode
                 {
                     foreach (VariableObj variableObj in nasbParserFile.variables)
                     {
-                        var accString = Utils.GetAccessabilityLevelString(variableObj.accessability);
+                        //var accString = Utils.GetAccessabilityLevelString(variableObj.accessability);
+                        var accString = "public";
                         if (basicTypes.Contains(variableObj.variableType))
                         {
-                            AddToFileContents($"public {variableObj.variableType} {variableObj.name};");
+                            AddToFileContents($"{accString} {variableObj.variableType} {variableObj.name};");
+                        } else if (variableObj.variableType.Equals("Vector3"))
+                        {
+                            AddToFileContents($"{accString} UnityEngine.Vector3 {variableObj.name};");
                         } else
                         {
                             AddToFileContents($"[Output] public {variableObj.variableType} {variableObj.name};");
