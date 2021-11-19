@@ -13,7 +13,7 @@ namespace NASB_Parser_To_xNode
         private static string fileContents;
 
         private static string[] otherImports = { "UnityEngine", "UnityEditor", "XNode", "XNodeEditor", "NASB_Parser" };
-        private static List<string> basicTypes = new List<string> { "bool", "int", "string", "float", "double" };
+        private static List<string> basicTypes = new List<string> { "bool", "int", "string", "float", "double", "UnityEngine.Vector3" };
         private static Dictionary<string, string> specialCaseImports = new Dictionary<string, string>{
             { "SASetFloatTarget", "static NASB_Parser.StateActions.SASetFloatTarget" },
             {"SAManipHurtbox", "static NASB_Parser.StateActions.SAManipHurtbox" },
@@ -92,6 +92,9 @@ namespace NASB_Parser_To_xNode
                     //var accString = Utils.GetAccessabilityLevelString(variableObj.accessability);
                     var accString = "public";
                     var startOfLine = $"{accString} {(variableObj.isStatic ? "static " : "")}{(variableObj.isReadonly ? "readonly " : "")}";
+
+                    if (variableObj.variableType.Equals("Vector3")) variableObj.variableType = "UnityEngine.Vector3";
+
                     if (basicTypes.Contains(variableObj.variableType))
                     {
                         AddToFileContents($"{startOfLine}{variableObj.variableType} {variableObj.name};");
@@ -101,14 +104,16 @@ namespace NASB_Parser_To_xNode
                         // Type is an enum contained within the class
                         AddToFileContents($"{startOfLine}{variableObj.variableType} {variableObj.name};");
                     }
-                    else if (variableObj.variableType.Equals("Vector3"))
-                    {
-                        // Special case for Vector3 collision with NASB_Parser
-                        AddToFileContents($"{startOfLine}UnityEngine.Vector3 {variableObj.name};");
-                    }
                     else
                     {
-                        AddToFileContents($"[Output] public {variableObj.variableType} {variableObj.name};");
+                        // If the name matches a nested class, we don't want to give it the [Output] attribute
+                        if (nasbParserFile.nestedClasses.Any(x => x.className.Equals(variableObj.variableType)) || isNested)
+                        {
+                            AddToFileContents($"{startOfLine}{variableObj.variableType} {variableObj.name};");
+                        } else
+                        {
+                            AddToFileContents($"[Output] public {variableObj.variableType} {variableObj.name};");
+                        }
                     }
                 }
 
