@@ -1,5 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 
 namespace NASB_Parser_To_xNode
@@ -19,8 +20,24 @@ namespace NASB_Parser_To_xNode
             {
                 AddToFileContents("using " + importString + ";");
             }
+
+            AddToFileContents("");
+            AddToFileContents("namespace NASB_Moveset_Editor");
             OpenBlock();
-            AddToFileContents("Test!;");
+            {
+                AddToFileContents("[Serializable]");
+                string className = Path.GetFileNameWithoutExtension(nasbParserFile.relativePath);
+                AddToFileContents($"public class {className}Node : {nasbParserFile.parentClass}Node");
+                OpenBlock();
+                {
+                    foreach (VariableObj variableObj in nasbParserFile.variables)
+                    {
+                        var accString = Utils.GetAccessabilityLevelString(variableObj.accessability);
+                        AddToFileContents($"public {variableObj.variableType} {variableObj.name};");
+                    }
+                }
+                CloseBlock();
+            }
             CloseBlock();
 
             return fileContents;
