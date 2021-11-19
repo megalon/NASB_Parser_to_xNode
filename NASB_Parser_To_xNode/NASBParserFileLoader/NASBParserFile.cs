@@ -11,6 +11,8 @@ namespace NASB_Parser_To_xNode
         public string @namespace;
         public AccessabilityLevel classType;
         public bool isAbstract;
+        public bool isStatic;
+        public string className;
         public string parentClass;
         public List<VariableObj> variables;
         public List<EnumObj> enums;

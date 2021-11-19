@@ -39,6 +39,7 @@ namespace NASB_Parser_To_xNode
                     string line;
                     string className = Path.GetFileNameWithoutExtension(filePath);
                     nasbParserFile.relativePath = filePath.Substring(mainPath.Length);
+                    nasbParserFile.className = Path.GetFileNameWithoutExtension(nasbParserFile.relativePath);
 
                     mainFileReadingState = ReadingState.ReadingImportsAndNamespace;
                     ReadingThing topLevelThing = ReadingThing.Nothing;
@@ -114,14 +115,25 @@ namespace NASB_Parser_To_xNode
                 nasbParserFile.parentClass = line.Substring(line.IndexOf(" : ") + " : ".Length);
             }
 
-            var trimmedLine = line.Trim();
-
             nasbParserFile.classType = Utils.GetAccessabilityLevel(line);
 
-            if (line.Contains(" abstract ")) nasbParserFile.isAbstract = true;
+            int nameIndex = 2;
+            if (line.Contains(" abstract "))
+            {
+                nasbParserFile.isAbstract = true;
+                nameIndex++;
+            }
+
+            if (line.Contains(" static "))
+            {
+                nasbParserFile.isStatic = true;
+                nameIndex++;
+            }
+
+            var split = line.Trim().Split(" ");
+            nasbParserFile.className = split[nameIndex];
 
             ReadingThing thingInClass;
-
             ReadingState classReadingState = ReadingState.ReadingThings;
 
             while (!sr.EndOfStream)
