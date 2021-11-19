@@ -7,16 +7,25 @@ namespace NASB_Parser_To_xNode
     class Program
     {
         public static List<NASBParserFile> nasbParserFiles;
-        public static string mainPath;
 
         static void Main(string[] args)
         {
             Consts.GenerateClassToTypeIdDict();
 
-            mainPath = "D:/megalon-github/NASB/NASB_Parser/NASB_Parser/";
+            string mainPath = "D:/megalon-github/NASB/NASB_Parser/NASB_Parser/";
             string outputPath = "D:/UnityProjects/NASB-Character-NodeEditor/Assets/NASB Moveset Editor/Editor Scripts/Nodes";
 
             LoadAllNASBClasses(mainPath);
+            WriteAllXNodeFiles(outputPath);
+        }
+
+        private static void WriteAllXNodeFiles(string outputPath)
+        {
+            foreach (NASBParserFile file in nasbParserFiles)
+            {
+                string fileText = xNodeTextGenerator.GenerateXNodeFileText(file);
+                Console.WriteLine(fileText);
+            }
         }
 
         private static void LoadAllNASBClasses(string mainPath)
