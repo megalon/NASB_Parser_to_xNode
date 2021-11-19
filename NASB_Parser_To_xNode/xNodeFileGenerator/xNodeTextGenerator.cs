@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -61,7 +61,7 @@ namespace NASB_Parser_To_xNode
             OpenBlock();
             {
                 AddToFileContents("[Serializable]");
-                AddToFileContents($"public class {className}Node : {nasbParserFile.parentClass}Node");
+                AddToFileContents($"public {(nasbParserFile.isAbstract ? "abstract " : "")}class {className}Node : {nasbParserFile.parentClass}Node");
                 OpenBlock();
                 {
                     // Variables
