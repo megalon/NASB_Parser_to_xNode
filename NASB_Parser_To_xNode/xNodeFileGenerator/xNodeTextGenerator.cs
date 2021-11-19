@@ -21,6 +21,7 @@ namespace NASB_Parser_To_xNode
             {"SAMapAnimation", "static NASB_Parser.StateActions.SAMapAnimation" },
             {"SAStandardInput", "static NASB_Parser.StateActions.SAStandardInput" },
         };
+
         public static string GenerateXNodeFileText(NASBParserFile nasbParserFile)
         {
             string className = Path.GetFileNameWithoutExtension(nasbParserFile.relativePath);
@@ -28,6 +29,10 @@ namespace NASB_Parser_To_xNode
             indentCount = 0;
             indent = "";
 
+            // Convert ISerializable to Node
+            if (nasbParserFile.parentClass != null && nasbParserFile.parentClass.Equals("ISerializable")) nasbParserFile.parentClass = "";
+
+            // Imports
             foreach (string importString in nasbParserFile.imports)
             {
                 AddToFileContents("using " + importString + ";");
@@ -55,13 +60,10 @@ namespace NASB_Parser_To_xNode
             OpenBlock();
             {
                 AddToFileContents("[Serializable]");
-
-                // Convert ISerializable to Node
-                if (nasbParserFile.parentClass != null && nasbParserFile.parentClass.Equals("ISerializable")) nasbParserFile.parentClass = "";
-
                 AddToFileContents($"public class {className}Node : {nasbParserFile.parentClass}Node");
                 OpenBlock();
                 {
+                    // Variables
                     foreach (VariableObj variableObj in nasbParserFile.variables)
                     {
                         //var accString = Utils.GetAccessabilityLevelString(variableObj.accessability);
@@ -78,6 +80,7 @@ namespace NASB_Parser_To_xNode
                         }
                     }
 
+                    // Enums
                     foreach (EnumObj enumObj in nasbParserFile.enums)
                     {
                         AddToFileContents("");
