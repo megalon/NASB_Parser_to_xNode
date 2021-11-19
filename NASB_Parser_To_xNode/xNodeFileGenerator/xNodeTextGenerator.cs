@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -13,8 +13,17 @@ namespace NASB_Parser_To_xNode
 
         private static string[] otherImports = { "UnityEngine", "UnityEditor", "XNode", "XNodeEditor", "NASB_Parser" };
         private static List<string> basicTypes = new List<string> { "bool", "int", "string", "float", "double" };
+        private static Dictionary<string, string> specialCaseImports = new Dictionary<string, string>{
+            { "SASetFloatTarget", "static NASB_Parser.StateActions.SASetFloatTarget" },
+            {"SAManipHurtbox", "static NASB_Parser.StateActions.SAManipHurtbox" },
+            {"SAManipHitbox", "static NASB_Parser.StateActions.SAManipHitbox" },
+            {"SAGUAMessageObject", "static NASB_Parser.StateActions.SAGUAMessageObject" },
+            {"SAMapAnimation", "static NASB_Parser.StateActions.SAMapAnimation" },
+            {"SAStandardInput", "static NASB_Parser.StateActions.SAStandardInput" },
+        };
         public static string GenerateXNodeFileText(NASBParserFile nasbParserFile)
         {
+            string className = Path.GetFileNameWithoutExtension(nasbParserFile.relativePath);
             fileContents = "";
             indentCount = 0;
             indent = "";
@@ -29,12 +38,23 @@ namespace NASB_Parser_To_xNode
                 AddToFileContents("using " + importString + ";");
             }
 
+            foreach (NASBParserFolder folder in Consts.folders)
+            {
+                var extraParserImport = "NASB_Parser." + folder.folderName;
+                if (!nasbParserFile.imports.Contains(extraParserImport))
+                    AddToFileContents("using " + extraParserImport + ";");
+            }
+
+            if (specialCaseImports.ContainsKey(className))
+            {
+                AddToFileContents("using " + specialCaseImports[className] + ";");
+            }
+
             AddToFileContents("");
             AddToFileContents("namespace NASB_Moveset_Editor");
             OpenBlock();
             {
                 AddToFileContents("[Serializable]");
-                string className = Path.GetFileNameWithoutExtension(nasbParserFile.relativePath);
 
                 // Convert ISerializable to Node
                 if (nasbParserFile.parentClass != null && nasbParserFile.parentClass.Equals("ISerializable")) nasbParserFile.parentClass = "";
