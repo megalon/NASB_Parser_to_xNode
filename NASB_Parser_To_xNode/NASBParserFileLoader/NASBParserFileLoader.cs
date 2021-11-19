@@ -136,10 +136,22 @@ namespace NASB_Parser_To_xNode
             ReadingThing thingInClass;
             ReadingState classReadingState = ReadingState.ReadingThings;
 
-            while (!sr.EndOfStream)
+            // Consume first {
+            sr.ReadLine();
+            int blockCount = 1;
+
+            while (blockCount > 0 && !sr.EndOfStream)
             {
                 line = sr.ReadLine();
                 thingInClass = LookForThing(line);
+
+                if (line.Trim().StartsWith("{"))
+                {
+                    blockCount++;
+                } else if (line.Trim().StartsWith("}"))
+                {
+                    blockCount--;
+                }
 
                 switch (classReadingState)
                 {

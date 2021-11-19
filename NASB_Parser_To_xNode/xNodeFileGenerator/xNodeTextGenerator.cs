@@ -56,19 +56,34 @@ namespace NASB_Parser_To_xNode
             AddToFileContents("namespace NASB_Moveset_Editor");
             OpenBlock();
             {
-                HandleClass(nasbParserFile);
+                HandleClass(nasbParserFile, false);
             }
             CloseBlock();
 
             return fileContents;
         }
 
-        private static void HandleClass(NASBParserFile nasbParserFile)
+        private static void HandleClass(NASBParserFile nasbParserFile, bool isNested)
         {
-            // Convert ISerializable to Node
-            if (nasbParserFile.parentClass != null && nasbParserFile.parentClass.Equals("ISerializable")) nasbParserFile.parentClass = "";
             AddToFileContents("[Serializable]");
-            AddToFileContents($"public {(nasbParserFile.isAbstract ? "abstract " : "")}class {nasbParserFile.className}Node : {nasbParserFile.parentClass}Node");
+
+            string classDeclaration = $"public {(nasbParserFile.isAbstract ? "abstract " : "")}class {nasbParserFile.className}";
+            if (isNested)
+            {
+                if (nasbParserFile.parentClass != null)
+                {
+                    if (nasbParserFile.parentClass.Equals("ISerializable")) nasbParserFile.parentClass = "Node";
+                    classDeclaration += $" : {nasbParserFile.parentClass}";
+                }
+            }
+            else
+            {
+                if (nasbParserFile.parentClass != null && nasbParserFile.parentClass.Equals("ISerializable")) nasbParserFile.parentClass = "";
+                classDeclaration += $"Node : {nasbParserFile.parentClass}Node";
+            }
+
+            AddToFileContents(classDeclaration);
+
             OpenBlock();
             {
                 // Variables
@@ -113,23 +128,27 @@ namespace NASB_Parser_To_xNode
                     CloseBlock();
                 }
 
-                // Init function
-                AddToFileContents("");
-                AddToFileContents("protected override void Init()");
-                OpenBlock();
+
+                // Node specific functions
+                if (nasbParserFile.parentClass != null)
                 {
-                    AddToFileContents("base.Init();");
-                    if (Consts.classToTypeId.ContainsKey(nasbParserFile.className))
-                        AddToFileContents($"TID = TypeId.{Consts.classToTypeId[nasbParserFile.className]};");
+                    AddToFileContents("");
+                    AddToFileContents("protected override void Init()");
+                    OpenBlock();
+                    {
+                        AddToFileContents("base.Init();");
+                        if (Consts.classToTypeId.ContainsKey(nasbParserFile.className))
+                            AddToFileContents($"TID = TypeId.{Consts.classToTypeId[nasbParserFile.className]};");
+                    }
+                    CloseBlock();
                 }
-                CloseBlock();
 
                 // Handle nested classes
                 foreach (NASBParserFile nestedClass in nasbParserFile.nestedClasses)
                 {
                     Console.WriteLine($"Writing nested class {nestedClass.relativePath} for {nasbParserFile.relativePath}");
                     AddToFileContents("");
-                    HandleClass(nestedClass);
+                    HandleClass(nestedClass, true);
                 }
             }
             CloseBlock();
