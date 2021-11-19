@@ -11,7 +11,7 @@ namespace NASB_Parser_To_xNode
         private static string indent;
         private static string fileContents;
 
-        private static string[] otherImports = { "UnityEngine", "UnityEditor", "xNode", "xNodeEditor" };
+        private static string[] otherImports = { "UnityEngine", "UnityEditor", "XNode", "XNodeEditor" };
         private static List<string> basicTypes = new List<string> { "bool", "int", "string", "float", "double" };
         public static string GenerateXNodeFileText(NASBParserFile nasbParserFile)
         {
@@ -35,6 +35,10 @@ namespace NASB_Parser_To_xNode
             {
                 AddToFileContents("[Serializable]");
                 string className = Path.GetFileNameWithoutExtension(nasbParserFile.relativePath);
+
+                // Convert ISerializable to Node
+                if (nasbParserFile.parentClass != null && nasbParserFile.parentClass.Equals("ISerializable")) nasbParserFile.parentClass = "";
+
                 AddToFileContents($"public class {className}Node : {nasbParserFile.parentClass}Node");
                 OpenBlock();
                 {
