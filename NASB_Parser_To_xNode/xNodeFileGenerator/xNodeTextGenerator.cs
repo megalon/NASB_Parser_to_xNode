@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Linq;
 
 namespace NASB_Parser_To_xNode
 {
@@ -71,8 +72,13 @@ namespace NASB_Parser_To_xNode
                         if (basicTypes.Contains(variableObj.variableType))
                         {
                             AddToFileContents($"{accString} {variableObj.variableType} {variableObj.name};");
+                        } else if (nasbParserFile.enums.Any(x => x.name.Equals(variableObj.variableType)))
+                        {
+                            // Type is an enum contained within the class
+                            AddToFileContents($"{accString} {variableObj.variableType} {variableObj.name};");
                         } else if (variableObj.variableType.Equals("Vector3"))
                         {
+                            // Special case for Vector3 collision with NASB_Parser
                             AddToFileContents($"{accString} UnityEngine.Vector3 {variableObj.name};");
                         } else
                         {
