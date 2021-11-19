@@ -4,7 +4,7 @@ using System.Text;
 
 namespace NASB_Parser_To_xNode
 {
-    class NASBParserFile
+    public class NASBParserFile
     {
         public string relativePath;
         public List<string> imports;
@@ -25,13 +25,13 @@ namespace NASB_Parser_To_xNode
         }
     }
 
-    class VariableObj : BaseObj
+    public class VariableObj : BaseObj
     {
         public string variableType;
         public bool isList;
     }
 
-    class EnumObj : BaseObj
+    public class EnumObj : BaseObj
     {
         public List<string> enumNames;
 
@@ -41,13 +41,13 @@ namespace NASB_Parser_To_xNode
         }
     }
 
-    class BaseObj
+    public abstract class BaseObj
     {
         public string name;
         public AccessabilityLevel accessability;
     }
 
-    enum AccessabilityLevel
+    public enum AccessabilityLevel
     {
         Public,
         Private,
