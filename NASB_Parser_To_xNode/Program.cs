@@ -244,7 +244,12 @@ namespace NASB_Parser_To_xNode
             }
 
             var split = line.Split(" ");
-            variableObj.variableType = split[1];
+
+            if (variableObj.isList)
+                variableObj.variableType = Utils.GetStringBetweenStrings(split[1], "List<", ">");
+            else
+                variableObj.variableType = split[1];
+
             variableObj.name = split[2];
 
             nasbParserFile.variables.Add(variableObj);
