@@ -36,7 +36,7 @@ namespace NASB_Parser_To_xNode
             {
                 return AccessabilityLevel.Private;
             }
-            else if (line.StartsWith("protected"))
+            else if (line.StartsWith("protected "))
             {
                 return AccessabilityLevel.Protected;
             }
