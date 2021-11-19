@@ -21,10 +21,10 @@ namespace NASB_Parser_To_xNode
 
         private static void WriteAllXNodeFiles(string outputPath)
         {
-            foreach (NASBParserFile file in nasbParserFiles)
+            foreach (NASBParserFile nasbParserFile in nasbParserFiles)
             {
-                string fileText = xNodeTextGenerator.GenerateXNodeFileText(file);
-                Console.WriteLine(fileText);
+                string fileText = xNodeTextGenerator.GenerateXNodeFileText(nasbParserFile);
+                xNodeFileGenerator.GenerateXNodeFile(fileText, outputPath, nasbParserFile.relativePath);
             }
         }
 
