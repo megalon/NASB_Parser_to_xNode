@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -11,7 +11,7 @@ namespace NASB_Parser_To_xNode
         private static string indent;
         private static string fileContents;
 
-        private static string[] otherImports = { "UnityEngine", "UnityEditor", "XNode", "XNodeEditor" };
+        private static string[] otherImports = { "UnityEngine", "UnityEditor", "XNode", "XNodeEditor", "NASB_Parser" };
         private static List<string> basicTypes = new List<string> { "bool", "int", "string", "float", "double" };
         public static string GenerateXNodeFileText(NASBParserFile nasbParserFile)
         {
