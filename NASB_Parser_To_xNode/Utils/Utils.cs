@@ -45,5 +45,19 @@ namespace NASB_Parser_To_xNode
                 throw new Exception("Uknown class type!");
             }
         }
+
+        public static string GetAccessabilityLevelString(AccessabilityLevel accessabilityLevel)
+        {
+            switch (accessabilityLevel)
+            {
+                case AccessabilityLevel.Public:
+                    return "public";
+                case AccessabilityLevel.Protected:
+                    return "protected";
+                case AccessabilityLevel.Private:
+                    return "private";
+            }
+            throw new Exception("Invalid AccessabilityLevel!");
+        }
     }
 }
