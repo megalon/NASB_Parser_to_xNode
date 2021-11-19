@@ -101,6 +101,16 @@ namespace NASB_Parser_To_xNode
                         }
                         CloseBlock();
                     }
+
+                    AddToFileContents("");
+                    AddToFileContents("protected override void Init()");
+                    OpenBlock();
+                    {
+                        AddToFileContents("base.Init();");
+                        if (Consts.classToTypeId.ContainsKey(className))
+                            AddToFileContents($"TID = TypeId.{Consts.classToTypeId[className]};");
+                    }
+                    CloseBlock();
                 }
                 CloseBlock();
             }
