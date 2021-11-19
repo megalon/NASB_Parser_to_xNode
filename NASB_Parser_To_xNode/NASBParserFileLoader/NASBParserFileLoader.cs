@@ -227,7 +227,7 @@ namespace NASB_Parser_To_xNode
             {
                 return ReadingThing.Class;
             }
-            else if (line.Contains("public ") || line.Contains("protected ") || line.Contains("private "))
+            else if (line.Contains("public ") || line.Contains("protected ") || line.Contains("private ") || line.Contains("internal "))
             {
                 // If this is a constructor or some other function with parenthesis
                 // Ignore special case where variables are initialized on the same line they are defined
