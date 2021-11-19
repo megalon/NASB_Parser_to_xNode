@@ -76,19 +76,20 @@ namespace NASB_Parser_To_xNode
                 {
                     //var accString = Utils.GetAccessabilityLevelString(variableObj.accessability);
                     var accString = "public";
+                    var startOfLine = $"{accString} {(variableObj.isStatic ? "static " : "")}{(variableObj.isReadonly ? "readonly " : "")}";
                     if (basicTypes.Contains(variableObj.variableType))
                     {
-                        AddToFileContents($"{accString} {variableObj.variableType} {variableObj.name};");
+                        AddToFileContents($"{startOfLine}{variableObj.variableType} {variableObj.name};");
                     }
                     else if (nasbParserFile.enums.Any(x => x.name.Equals(variableObj.variableType)))
                     {
                         // Type is an enum contained within the class
-                        AddToFileContents($"{accString} {variableObj.variableType} {variableObj.name};");
+                        AddToFileContents($"{startOfLine}{variableObj.variableType} {variableObj.name};");
                     }
                     else if (variableObj.variableType.Equals("Vector3"))
                     {
                         // Special case for Vector3 collision with NASB_Parser
-                        AddToFileContents($"{accString} UnityEngine.Vector3 {variableObj.name};");
+                        AddToFileContents($"{startOfLine}UnityEngine.Vector3 {variableObj.name};");
                     }
                     else
                     {

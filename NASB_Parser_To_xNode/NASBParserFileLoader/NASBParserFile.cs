@@ -31,6 +31,8 @@ namespace NASB_Parser_To_xNode
     {
         public string variableType;
         public bool isList;
+        public bool isStatic;
+        public bool isReadonly;
     }
 
     public class EnumObj : BaseObj

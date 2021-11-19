@@ -213,14 +213,27 @@ namespace NASB_Parser_To_xNode
                 line = line.Substring(0, line.IndexOf(";"));
             }
 
+            int nameIndex = 2;
+            if (line.Contains(" static "))
+            {
+                variableObj.isStatic = true;
+                nameIndex++;
+            }
+
+            if (line.Contains(" readonly "))
+            {
+                variableObj.isReadonly = true;
+                nameIndex++;
+            }
+
             var split = line.Split(" ");
 
             if (variableObj.isList)
-                variableObj.variableType = Utils.GetStringBetweenStrings(split[1], "List<", ">");
+                variableObj.variableType = Utils.GetStringBetweenStrings(split[nameIndex - 1], "List<", ">");
             else
-                variableObj.variableType = split[1];
+                variableObj.variableType = split[nameIndex - 1];
 
-            variableObj.name = split[2];
+            variableObj.name = split[nameIndex];
 
             nasbParserFile.variables.Add(variableObj);
         }
