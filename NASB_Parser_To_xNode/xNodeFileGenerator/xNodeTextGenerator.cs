@@ -94,9 +94,9 @@ namespace NASB_Parser_To_xNode
                         AddToFileContents($"{accString} enum {enumObj.name}");
                         OpenBlock();
                         {
-                            foreach (string enumNames in enumObj.enumNames)
+                            foreach (string enumName in enumObj.enumNames)
                             {
-                                AddToFileContents($"{enumNames},");
+                                AddToFileContents($"{enumName},");
                             }
                         }
                         CloseBlock();
