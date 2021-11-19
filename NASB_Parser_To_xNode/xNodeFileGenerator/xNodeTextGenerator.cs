@@ -71,7 +71,7 @@ namespace NASB_Parser_To_xNode
         private static void CloseBlock()
         {
             UpdateIndent(-1);
-            AddToFileContents("{");
+            AddToFileContents("}");
         }
 
         private static void UpdateIndent(int indentDelta)
