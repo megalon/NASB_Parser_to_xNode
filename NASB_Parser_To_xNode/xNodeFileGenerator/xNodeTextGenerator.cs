@@ -10,6 +10,8 @@ namespace NASB_Parser_To_xNode
         private static int indentCount;
         private static string indent;
         private static string fileContents;
+
+        private static List<string> basicTypes = new List<string> { "bool", "int", "string", "float", "double" };
         public static string GenerateXNodeFileText(NASBParserFile nasbParserFile)
         {
             fileContents = "";
@@ -33,7 +35,13 @@ namespace NASB_Parser_To_xNode
                     foreach (VariableObj variableObj in nasbParserFile.variables)
                     {
                         var accString = Utils.GetAccessabilityLevelString(variableObj.accessability);
-                        AddToFileContents($"public {variableObj.variableType} {variableObj.name};");
+                        if (basicTypes.Contains(variableObj.variableType))
+                        {
+                            AddToFileContents($"public {variableObj.variableType} {variableObj.name};");
+                        } else
+                        {
+                            AddToFileContents($"[Output] public {variableObj.variableType} {variableObj.name};");
+                        }
                     }
                 }
                 CloseBlock();
