@@ -13,7 +13,6 @@ namespace NASB_Parser_To_xNode
         private static string fileContents;
 
         private static string[] otherImports = { "UnityEngine", "UnityEditor", "XNode", "XNodeEditor", "NASB_Parser" };
-        private static List<string> basicTypes = new List<string> { "bool", "int", "string", "float", "double", "UnityEngine.Vector3" };
 
         public static string GenerateXNodeFileText(NASBParserFile nasbParserFile)
         {
@@ -85,45 +84,7 @@ namespace NASB_Parser_To_xNode
                 // Variables
                 foreach (VariableObj variableObj in nasbParserFile.variables)
                 {
-                    //var accString = Utils.GetAccessabilityLevelString(variableObj.accessability);
-                    var accString = "public";
-
-                    // Special case for TID and Version 
-                    if ((variableObj.name.Equals("TID") && variableObj.variableType.Equals("TypeId"))
-                        || (variableObj.name.Equals("Version") && variableObj.variableType.Equals("int")))
-                    {
-                        accString = "protected";
-                    }
-
-                    var startOfLine = $"{accString} {(variableObj.isStatic ? "static " : "")}{(variableObj.isReadonly ? "readonly " : "")}";
-
-                    // Handle Vector3 ambiguity
-                    if (variableObj.variableType.Equals("Vector3")) variableObj.variableType = "UnityEngine.Vector3";
-
-                    // Handle List
-                    var fullType = variableObj.isList ? $"List<{variableObj.variableType}>" : variableObj.variableType;
-
-                    if (basicTypes.Contains(variableObj.variableType))
-                    {
-                        AddToFileContents($"{startOfLine}{fullType} {variableObj.name};");
-                    }
-                    else if (nasbParserFile.enums.Any(x => x.name.Equals(variableObj.variableType)))
-                    {
-                        // Type is an enum contained within the class
-                        AddToFileContents($"{startOfLine}{fullType} {variableObj.name};");
-                    }
-                    else
-                    {
-                        // If the name matches a nested class, we don't want to give it the [Output] attribute
-                        if (nasbParserFile.nestedClasses.Any(x => x.className.Equals(variableObj.variableType)) || isNested)
-                        {
-                            AddToFileContents($"{startOfLine}{fullType} {variableObj.name};");
-                        } else
-                        {
-                            // All other types are set to [Output]
-                            AddToFileContents($"[Output] public {fullType} {variableObj.name};");
-                        }
-                    }
+                    AddToFileContents(VariableStringGenerator.GetVariableString(variableObj, nasbParserFile, isNested));
                 }
 
                 // Enums
