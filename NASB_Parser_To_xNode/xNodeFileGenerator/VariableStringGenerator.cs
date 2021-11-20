@@ -43,8 +43,9 @@ namespace NASB_Parser_To_xNode
                 return ($"{startOfLine}{relativeNamespace}{fullType} {variableObj.name};");
             }
 
-            // If the name matches another class file
-            if (Program.nasbParserFiles.Any(x => x.className.Equals(variableObj.variableType)))
+            // If the name matches another class file, excluding enum only classes
+            if (Program.nasbParserFiles.Any(x => x.className.Equals(variableObj.variableType))
+                && !Consts.enumOnlyFiles.Contains(variableObj.variableType))
             {
                 return ($"[Output] public {relativeNamespace}{fullType} {variableObj.name};");
             }

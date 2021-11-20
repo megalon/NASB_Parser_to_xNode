@@ -47,6 +47,11 @@ namespace NASB_Parser_To_xNode
                     AddToFileContents("using " + extraParserImport + ";");
             }
 
+            foreach (NASBParserFolder folder in Consts.folders)
+            {
+                AddToFileContents($"using NASB_Moveset_Editor.{folder.folderName};");
+            }
+
             if (nasbParserFile.parentClass != null
                 && !nasbParserFile.parentClass.Equals(string.Empty)
                 && !Path.GetDirectoryName(nasbParserFile.relativePath).Equals(string.Empty))
@@ -165,8 +170,13 @@ namespace NASB_Parser_To_xNode
                     OpenBlock();
                     {
                         AddToFileContents($"name = NodeEditorUtilities.NodeDefaultName(typeof({nasbParserFile.className}));");
+                        AddToFileContents("position.x = xyPos.x;");
+                        AddToFileContents("position.y = xyPos.y;");
+                        AddToFileContents("int variableCount = 0;");
+                        int numVariables = 0;
                         foreach (VariableObj variableObj in nasbParserFile.variables)
                         {
+                            ++numVariables;
                             // Check if this is a nested class
                             if (nasbParserFile.nestedClasses.Any(x => x.className.Equals(variableObj.variableType)))
                             {
@@ -214,6 +224,24 @@ namespace NASB_Parser_To_xNode
                             } else
                             {
                                 AddToFileContents($"{variableObj.name} = data.{variableObj.name};");
+
+                                // If this variable is a class in the NASB_Parser, excluding enum only classes
+                                if (Program.nasbParserFiles.Any(x => x.className.Equals(variableObj.variableType))
+                                    && !Consts.enumOnlyFiles.Contains(variableObj.variableType))
+                                {
+                                    if (!variableObj.isList)
+                                    {
+                                        // Create the node for this variable type and add it to the graph
+                                        AddToFileContents($"");
+                                        string nodeName = $"node_{variableObj.name}";
+                                        AddToFileContents($"{variableObj.variableType}Node {nodeName} = graph.AddNode<{variableObj.variableType}Node>();");
+                                        AddToFileContents($"GetPort(\"{variableObj.name}\").Connect({nodeName}.GetPort(\"NodeInput\"));");
+                                        AddToFileContents($"AssetDatabase.AddObjectToAsset({nodeName}, assetPath);");
+                                        AddToFileContents($"{nodeName}.SetData({variableObj.name}, graph, assetPath, xyPos + new Vector2(Consts.NodeXOffset, variableCount * Consts.NodeYOffset));");
+                                        if (numVariables < nasbParserFile.variables.Count) AddToFileContents("++variableCount;");
+                                        AddToFileContents($"");
+                                    }
+                                }
                             }
                         }
                     }
