@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -179,7 +179,17 @@ namespace NASB_Parser_To_xNode
                                         AddToFileContents($"{variableObj.variableType} temp = new {variableObj.variableType}();");
                                         foreach (VariableObj nestedVariable in nestedClass.variables)
                                         {
-                                            AddToFileContents($"temp.{nestedVariable.name} = {variableObj.name}_item.{nestedVariable.name};");
+                                            // Dumb special case cast
+                                            if (nasbParserFile.className.Equals("SASetFloatTarget") 
+                                                && variableObj.name.Equals("Sets")
+                                                && nestedVariable.name.Equals("Way"))
+                                            {
+                                                AddToFileContents($"temp.{nestedVariable.name} = (SetFloat.ManipWay){variableObj.name}_item.{nestedVariable.name};");
+                                            }
+                                            else
+                                            {
+                                                AddToFileContents($"temp.{nestedVariable.name} = {variableObj.name}_item.{nestedVariable.name};");
+                                            }
                                         }
                                         AddToFileContents($"{variableObj.name}.Add(temp);");
                                     }
