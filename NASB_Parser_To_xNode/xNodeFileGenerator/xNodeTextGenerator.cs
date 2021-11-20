@@ -247,52 +247,12 @@ namespace NASB_Parser_To_xNode
                                         AddToFileContents($"foreach ({variableObj.variableType} {variableObj.name}_item in {variableObj.name})");
                                         OpenBlock();
                                         {
-                                            if (dict != null)
-                                            {
-                                                AddToFileContents($"switch ({variableObj.name}_item.TID)");
-                                                OpenBlock();
-                                                foreach (string key in dict.Keys)
-                                                {
-                                                    AddToFileContents($"case {variableObj.variableType}.TypeId.{key}:");
-                                                    UpdateIndent(1);
-                                                    {
-                                                        AddNodeToGraph(nodeName, variableObj, key, dict[key], "_item");
-                                                    }
-                                                    UpdateIndent(-1);
-                                                    AddToFileContents($"break;");
-
-                                                }
-                                                CloseBlock();
-                                            }
-                                            else
-                                            {
-                                                AddNodeToGraph(nodeName, variableObj, null, null, "_item");
-                                            }
+                                            GenerateSwitchStatement(nodeName, variableObj, dict, "_item");
                                             AddToFileContents("++variableCount;");
                                         }
                                         CloseBlock();
                                     } else {
-                                        // Create the node for this variable type and add it to the graph
-                                        if (dict != null)
-                                        {
-                                            AddToFileContents($"switch ({variableObj.name}.TID)");
-                                            OpenBlock();
-                                            foreach (string key in dict.Keys)
-                                            {
-                                                AddToFileContents($"case {variableObj.variableType}.TypeId.{key}:");
-                                                UpdateIndent(1);
-                                                {
-                                                    AddNodeToGraph(nodeName, variableObj, key, dict[key], "");
-                                                }
-                                                UpdateIndent(-1);
-                                                AddToFileContents($"break;");
-
-                                            }
-                                            CloseBlock();
-                                        } else
-                                        {
-                                            AddNodeToGraph(nodeName, variableObj, null, null, "");
-                                        }
+                                        GenerateSwitchStatement(nodeName, variableObj, dict, "");
                                         if (numVariables < nasbParserFile.variables.Count) AddToFileContents("++variableCount;");
                                     }
                                     AddToFileContents($"");
@@ -312,6 +272,32 @@ namespace NASB_Parser_To_xNode
                 }
             }
             CloseBlock();
+        }
+
+        private static void GenerateSwitchStatement(string nodeName, VariableObj variableObj, Dictionary<string, string> dict, string itemText)
+        {
+            // Create the node for this variable type and add it to the graph
+            if (dict != null)
+            {
+                AddToFileContents($"switch ({variableObj.name}{itemText}.TID)");
+                OpenBlock();
+                foreach (string key in dict.Keys)
+                {
+                    AddToFileContents($"case {variableObj.variableType}.TypeId.{key}:");
+                    UpdateIndent(1);
+                    {
+                        AddNodeToGraph(nodeName, variableObj, key, dict[key], itemText);
+                    }
+                    UpdateIndent(-1);
+                    AddToFileContents($"break;");
+
+                }
+                CloseBlock();
+            }
+            else
+            {
+                AddNodeToGraph(nodeName, variableObj, null, null, itemText);
+            }
         }
 
         private static void AddNodeToGraph(string nodeName, VariableObj variableObj, string key, string value, string itemText)
