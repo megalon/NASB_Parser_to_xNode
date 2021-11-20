@@ -14,14 +14,6 @@ namespace NASB_Parser_To_xNode
 
         private static string[] otherImports = { "UnityEngine", "UnityEditor", "XNode", "XNodeEditor", "NASB_Parser" };
         private static List<string> basicTypes = new List<string> { "bool", "int", "string", "float", "double", "UnityEngine.Vector3" };
-        private static Dictionary<string, string> specialCaseImports = new Dictionary<string, string>{
-            { "SASetFloatTarget", "static NASB_Parser.StateActions.SASetFloatTarget" },
-            {"SAManipHurtbox", "static NASB_Parser.StateActions.SAManipHurtbox" },
-            {"SAManipHitbox", "static NASB_Parser.StateActions.SAManipHitbox" },
-            {"SAGUAMessageObject", "static NASB_Parser.StateActions.SAGUAMessageObject" },
-            {"SAMapAnimation", "static NASB_Parser.StateActions.SAMapAnimation" },
-            {"SAStandardInput", "static NASB_Parser.StateActions.SAStandardInput" },
-        };
 
         public static string GenerateXNodeFileText(NASBParserFile nasbParserFile)
         {
@@ -45,11 +37,6 @@ namespace NASB_Parser_To_xNode
                 var extraParserImport = "NASB_Parser." + folder.folderName;
                 if (!nasbParserFile.imports.Contains(extraParserImport))
                     AddToFileContents("using " + extraParserImport + ";");
-            }
-
-            if (specialCaseImports.ContainsKey(nasbParserFile.className))
-            {
-                AddToFileContents("using " + specialCaseImports[nasbParserFile.className] + ";");
             }
 
             AddToFileContents("");
@@ -125,6 +112,7 @@ namespace NASB_Parser_To_xNode
                             AddToFileContents($"{startOfLine}{fullType} {variableObj.name};");
                         } else
                         {
+                            // All other types are set to [Output]
                             AddToFileContents($"[Output] public {fullType} {variableObj.name};");
                         }
                     }
