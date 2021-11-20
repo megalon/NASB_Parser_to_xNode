@@ -247,10 +247,27 @@ namespace NASB_Parser_To_xNode
                                         AddToFileContents($"foreach ({variableObj.variableType} {variableObj.name}_item in {variableObj.name})");
                                         OpenBlock();
                                         {
-                                            AddToFileContents($"{variableObj.variableType}Node {nodeName} = graph.AddNode<{variableObj.variableType}Node>();");
-                                            AddToFileContents($"GetPort(\"{variableObj.name}\").Connect({nodeName}.GetPort(\"NodeInput\"));");
-                                            AddToFileContents($"AssetDatabase.AddObjectToAsset({nodeName}, assetPath);");
-                                            AddToFileContents($"{nodeName}.SetData({variableObj.name}_item, graph, assetPath, xyPos + new Vector2(Consts.NodeXOffset, (Consts.NodeHeight + Consts.NodeYOffset) * variableCount));");
+                                            if (dict != null)
+                                            {
+                                                AddToFileContents($"switch ({variableObj.name}_item.TID)");
+                                                OpenBlock();
+                                                foreach (string key in dict.Keys)
+                                                {
+                                                    AddToFileContents($"case {variableObj.variableType}.TypeId.{key}:");
+                                                    UpdateIndent(1);
+                                                    {
+                                                        AddNodeToGraph(nodeName, variableObj, key, dict[key], "_item");
+                                                    }
+                                                    UpdateIndent(-1);
+                                                    AddToFileContents($"break;");
+
+                                                }
+                                                CloseBlock();
+                                            }
+                                            else
+                                            {
+                                                AddNodeToGraph(nodeName, variableObj, null, null, "_item");
+                                            }
                                             AddToFileContents("++variableCount;");
                                         }
                                         CloseBlock();
@@ -265,7 +282,7 @@ namespace NASB_Parser_To_xNode
                                                 AddToFileContents($"case {variableObj.variableType}.TypeId.{key}:");
                                                 UpdateIndent(1);
                                                 {
-                                                    AddNodeToGraph(nodeName, variableObj, key, dict[key]);
+                                                    AddNodeToGraph(nodeName, variableObj, key, dict[key], "");
                                                 }
                                                 UpdateIndent(-1);
                                                 AddToFileContents($"break;");
@@ -274,7 +291,7 @@ namespace NASB_Parser_To_xNode
                                             CloseBlock();
                                         } else
                                         {
-                                            AddNodeToGraph(nodeName, variableObj, null, null);
+                                            AddNodeToGraph(nodeName, variableObj, null, null, "");
                                         }
                                         if (numVariables < nasbParserFile.variables.Count) AddToFileContents("++variableCount;");
                                     }
@@ -297,7 +314,7 @@ namespace NASB_Parser_To_xNode
             CloseBlock();
         }
 
-        private static void AddNodeToGraph(string nodeName, VariableObj variableObj, string key, string value)
+        private static void AddNodeToGraph(string nodeName, VariableObj variableObj, string key, string value, string itemText)
         {
             if (key != null && !key.Equals(string.Empty))
             {
@@ -305,13 +322,13 @@ namespace NASB_Parser_To_xNode
                 AddToFileContents($"{value}Node {nodeName} = graph.AddNode<{value}Node>();");
                 AddToFileContents($"GetPort(\"{variableObj.name}\").Connect({nodeName}.GetPort(\"NodeInput\"));");
                 AddToFileContents($"AssetDatabase.AddObjectToAsset({nodeName}, assetPath);");
-                AddToFileContents($"{nodeName}.SetData(({value}){variableObj.name}, graph, assetPath, xyPos + new Vector2(Consts.NodeXOffset, (Consts.NodeHeight + Consts.NodeYOffset) * variableCount));");
+                AddToFileContents($"{nodeName}.SetData(({value}){variableObj.name}{itemText}, graph, assetPath, xyPos + new Vector2(Consts.NodeXOffset, (Consts.NodeHeight + Consts.NodeYOffset) * variableCount));");
             } else
             {
                 AddToFileContents($"{variableObj.variableType}Node {nodeName} = graph.AddNode<{variableObj.variableType}Node>();");
                 AddToFileContents($"GetPort(\"{variableObj.name}\").Connect({nodeName}.GetPort(\"NodeInput\"));");
                 AddToFileContents($"AssetDatabase.AddObjectToAsset({nodeName}, assetPath);");
-                AddToFileContents($"{nodeName}.SetData({variableObj.name}, graph, assetPath, xyPos + new Vector2(Consts.NodeXOffset, (Consts.NodeHeight + Consts.NodeYOffset) * variableCount));");
+                AddToFileContents($"{nodeName}.SetData({variableObj.name}{itemText}, graph, assetPath, xyPos + new Vector2(Consts.NodeXOffset, (Consts.NodeHeight + Consts.NodeYOffset) * variableCount));");
             }
         }
 
