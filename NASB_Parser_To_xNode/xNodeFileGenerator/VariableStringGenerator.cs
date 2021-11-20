@@ -21,7 +21,7 @@ namespace NASB_Parser_To_xNode
                 accString = "protected";
 
                 if (variableObj.variableType.Equals("TypeId"))
-                    relativeNamespace = Utils.GetRelativeNamespace(nasbParserFile);
+                    relativeNamespace = Utils.GetRelativeNamespace(nasbParserFile) + ".";
             }
 
             var startOfLine = $"{accString} {(variableObj.isStatic ? "static " : "")}{(variableObj.isReadonly ? "readonly " : "")}";
@@ -54,7 +54,7 @@ namespace NASB_Parser_To_xNode
             {
                 if (!isNested)
                 {
-                    relativeNamespace = Utils.GetRelativeNamespace(nasbParserFile);
+                    relativeNamespace = Utils.GetRelativeNamespace(nasbParserFile) + ".";
                 }
             }
 

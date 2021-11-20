@@ -38,6 +38,19 @@ namespace NASB_Parser_To_xNode
                     AddToFileContents("using " + extraParserImport + ";");
             }
 
+            if (nasbParserFile.parentClass != null
+                && !nasbParserFile.parentClass.Equals(string.Empty)
+                && !Path.GetDirectoryName(nasbParserFile.relativePath).Equals(string.Empty))
+            {
+                if (nasbParserFile.parentClass.Equals("ISerializable"))
+                {
+                    AddToFileContents($"using static {Utils.GetRelativeNamespace(nasbParserFile)};");
+                } else 
+                {
+                    Utils.RecurseThroughParentNamespaces(nasbParserFile);
+                }
+            }
+
             AddToFileContents("");
 
             string namespaceSubfolder = "";
@@ -131,7 +144,7 @@ namespace NASB_Parser_To_xNode
             CloseBlock();
         }
 
-        private static void AddToFileContents(string line)
+        public static void AddToFileContents(string line)
         {
             fileContents += indent + line + "\n";
         }
