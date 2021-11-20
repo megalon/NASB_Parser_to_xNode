@@ -27,7 +27,7 @@ namespace NASB_Parser_To_xNode
             var startOfLine = $"{accString} {(variableObj.isStatic ? "static " : "")}{(variableObj.isReadonly ? "readonly " : "")}";
 
             // Handle Vector3 ambiguity
-            if (variableObj.variableType.Equals("Vector3")) variableObj.variableType = "UnityEngine.Vector3";
+            if (variableObj.variableType.Equals("Vector3")) variableObj.variableType = "NASB_Parser.Vector3";
 
             // Handle List
             var fullType = variableObj.isList ? $"List<{variableObj.variableType}>" : variableObj.variableType;
