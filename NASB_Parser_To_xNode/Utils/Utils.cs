@@ -1,11 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 
 namespace NASB_Parser_To_xNode
 {
     class Utils
     {
+        public static string GetRelativeNamespace(NASBParserFile nasbParserFile)
+        {
+            return $"NASB_Parser.{Path.GetDirectoryName(nasbParserFile.relativePath)}.{nasbParserFile.className}.";
+        }
+
         public static string GetStringBetweenStrings(string line, string start, string end)
         {
             string segment = null;

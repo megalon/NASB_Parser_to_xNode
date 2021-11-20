@@ -87,22 +87,24 @@ namespace NASB_Parser_To_xNode
                     AddToFileContents(VariableStringGenerator.GetVariableString(variableObj, nasbParserFile, isNested));
                 }
 
-                // Enums
-                foreach (EnumObj enumObj in nasbParserFile.enums)
+                // Enums, if this is a nested class
+                if (isNested)
                 {
-                    AddToFileContents("");
-                    var accString = Utils.GetAccessabilityLevelString(enumObj.accessability);
-                    AddToFileContents($"{accString} enum {enumObj.name}");
-                    OpenBlock();
+                    foreach (EnumObj enumObj in nasbParserFile.enums)
                     {
-                        foreach (string enumName in enumObj.enumNames)
+                        AddToFileContents("");
+                        var accString = Utils.GetAccessabilityLevelString(enumObj.accessability);
+                        AddToFileContents($"{accString} enum {enumObj.name}");
+                        OpenBlock();
                         {
-                            AddToFileContents($"{enumName},");
+                            foreach (string enumName in enumObj.enumNames)
+                            {
+                                AddToFileContents($"{enumName},");
+                            }
                         }
+                        CloseBlock();
                     }
-                    CloseBlock();
                 }
-
 
                 // Node specific functions
                 if (nasbParserFile.parentClass != null)
