@@ -140,6 +140,56 @@ namespace NASB_Parser_To_xNode
                             AddToFileContents($"TID = TypeId.{Consts.classToTypeId[nasbParserFile.className]};");
                     }
                     CloseBlock();
+
+                    // Set all variables
+                    AddToFileContents("");
+                    AddToFileContents($"public void SetData({nasbParserFile.className} data, MovesetGraph graph, string assetPath, Vector2 xyPos)");
+                    OpenBlock();
+                    {
+                        AddToFileContents($"name = NodeEditorUtilities.NodeDefaultName(typeof({nasbParserFile.className}));");
+                        foreach (VariableObj variableObj in nasbParserFile.variables)
+                        {
+                            // Check if this is a nested class
+                            if (nasbParserFile.nestedClasses.Any(x => x.className.Equals(variableObj.variableType)))
+                            {
+                                NASBParserFile nestedClass = nasbParserFile.nestedClasses.Find(x => x.className.Equals(variableObj.variableType));
+                                // We have to build a new object for the nested type
+
+                                var typeToCreate = variableObj.variableType;
+                                if (variableObj.isList)
+                                {
+                                    typeToCreate = "List<" + variableObj.variableType + ">";
+                                }
+
+                                AddToFileContents($"{variableObj.name} = new {typeToCreate}();");
+
+                                if (variableObj.isList)
+                                {
+                                    AddToFileContents($"foreach (var {variableObj.name}_listitem in data.{variableObj.name})");
+                                    OpenBlock();
+                                    {
+                                        AddToFileContents($"{variableObj.variableType} temp = new {variableObj.variableType}();");
+                                        foreach (VariableObj nestedVariable in nestedClass.variables)
+                                        {
+                                            AddToFileContents($"temp.{nestedVariable.name} = {variableObj.name}_listitem.{nestedVariable.name};");
+                                        }
+                                        AddToFileContents($"{variableObj.name}.Add(temp);");
+                                    }
+                                    CloseBlock();
+                                } else
+                                {
+                                    foreach (VariableObj nestedVariable in nestedClass.variables)
+                                    {
+                                        AddToFileContents($"{variableObj.name}.{nestedVariable.name} = data.{variableObj.name}.{nestedVariable.name};");
+                                    }
+                                }
+                            } else
+                            {
+                                AddToFileContents($"{variableObj.name} = data.{variableObj.name};");
+                            }
+                        }
+                    }
+                    CloseBlock();
                 }
 
                 // Handle nested classes
