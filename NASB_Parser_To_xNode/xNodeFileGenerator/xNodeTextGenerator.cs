@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -82,21 +82,26 @@ namespace NASB_Parser_To_xNode
 
         private static void HandleClass(NASBParserFile nasbParserFile, bool isNested)
         {
-            AddToFileContents("[Serializable]");
+            // AddToFileContents("[Serializable]");
 
             string classDeclaration = $"public {(nasbParserFile.isAbstract ? "abstract " : "")}class {nasbParserFile.className}";
             if (isNested)
             {
                 if (nasbParserFile.parentClass != null)
                 {
-                    if (nasbParserFile.parentClass.Equals("ISerializable")) nasbParserFile.parentClass = "Node";
+                    if (nasbParserFile.parentClass.Equals("ISerializable")) nasbParserFile.parentClass = "BaseMovesetNode";
                     classDeclaration += $" : {nasbParserFile.parentClass}";
                 }
             }
             else
             {
-                if (nasbParserFile.parentClass != null && nasbParserFile.parentClass.Equals("ISerializable")) nasbParserFile.parentClass = "";
-                classDeclaration += $"Node : {nasbParserFile.parentClass}Node";
+                if (nasbParserFile.parentClass == null || nasbParserFile.parentClass.Equals("ISerializable"))
+                {
+                    classDeclaration += $"Node : BaseMovesetNode";
+                } else
+                {
+                    classDeclaration += $"Node : {nasbParserFile.parentClass}Node";
+                }
             }
 
             AddToFileContents(classDeclaration);
