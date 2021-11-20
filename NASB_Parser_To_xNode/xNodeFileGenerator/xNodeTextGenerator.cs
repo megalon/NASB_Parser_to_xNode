@@ -167,14 +167,13 @@ namespace NASB_Parser_To_xNode
                     // Set all variables
                     AddToFileContents("");
 
-                    AddToFileContents($"public int SetData({nasbParserFile.className} data, MovesetGraph graph, string assetPath, Vector2 xyPos)");
+                    AddToFileContents($"public int SetData({nasbParserFile.className} data, MovesetGraph graph, string assetPath, Vector2 nodeDepthXY)");
                     OpenBlock();
                     {
                         AddToFileContents($"name = NodeEditorUtilities.NodeDefaultName(typeof({nasbParserFile.className}));");
-                        AddToFileContents("position.x = xyPos.x;");
-                        AddToFileContents("position.y = xyPos.y;");
+                        AddToFileContents("position.x = nodeDepthXY.x * Consts.NodeXOffset;");
+                        AddToFileContents("position.y = nodeDepthXY.y * Consts.NodeYOffset;");
                         AddToFileContents("int variableCount = 0;");
-                        AddToFileContents("int nodeYCount = 0;");
                         int numVariables = 0;
                         foreach (VariableObj variableObj in nasbParserFile.variables)
                         {
@@ -250,19 +249,17 @@ namespace NASB_Parser_To_xNode
                                         {
                                             GenerateSwitchStatement(nodeName, variableObj, dict, "_item");
                                             AddToFileContents("++variableCount;");
-                                            AddToFileContents("++nodeYCount;");
                                         }
                                         CloseBlock();
                                     } else {
                                         GenerateSwitchStatement(nodeName, variableObj, dict, "");
                                         if (numVariables < nasbParserFile.variables.Count) AddToFileContents("++variableCount;");
-                                        AddToFileContents("++nodeYCount;");
                                     }
                                     AddToFileContents($"");
                                 }
                             }
                         }
-                        AddToFileContents("return nodeYCount;");
+                        AddToFileContents("return variableCount;");
                     }
                     CloseBlock();
                 }
@@ -312,13 +309,13 @@ namespace NASB_Parser_To_xNode
                 AddToFileContents($"{value}Node {nodeName} = graph.AddNode<{value}Node>();");
                 AddToFileContents($"GetPort(\"{variableObj.name}\").Connect({nodeName}.GetPort(\"NodeInput\"));");
                 AddToFileContents($"AssetDatabase.AddObjectToAsset({nodeName}, assetPath);");
-                AddToFileContents($"nodeYCount += {nodeName}.SetData(({value}){variableObj.name}{itemText}, graph, assetPath, xyPos + new Vector2(Consts.NodeXOffset, (Consts.NodeYOffset * variableCount) + (Consts.NodeYOffset * nodeYCount)));");
+                AddToFileContents($"variableCount += {nodeName}.SetData(({value}){variableObj.name}{itemText}, graph, assetPath, nodeDepthXY + new Vector2(1, variableCount));");
             } else
             {
                 AddToFileContents($"{variableObj.variableType}Node {nodeName} = graph.AddNode<{variableObj.variableType}Node>();");
                 AddToFileContents($"GetPort(\"{variableObj.name}\").Connect({nodeName}.GetPort(\"NodeInput\"));");
                 AddToFileContents($"AssetDatabase.AddObjectToAsset({nodeName}, assetPath);");
-                AddToFileContents($"nodeYCount += {nodeName}.SetData({variableObj.name}{itemText}, graph, assetPath, xyPos + new Vector2(Consts.NodeXOffset, (Consts.NodeYOffset * variableCount) + (Consts.NodeYOffset * nodeYCount)));");
+                AddToFileContents($"variableCount += {nodeName}.SetData({variableObj.name}{itemText}, graph, assetPath, nodeDepthXY + new Vector2(1, variableCount));");
             }
         }
 
