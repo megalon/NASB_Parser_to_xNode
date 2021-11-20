@@ -102,26 +102,30 @@ namespace NASB_Parser_To_xNode
                     var accString = "public";
                     var startOfLine = $"{accString} {(variableObj.isStatic ? "static " : "")}{(variableObj.isReadonly ? "readonly " : "")}";
 
+                    // Handle Vector3 ambiguity
                     if (variableObj.variableType.Equals("Vector3")) variableObj.variableType = "UnityEngine.Vector3";
+
+                    // Handle List
+                    var fullType = variableObj.isList ? $"List<{variableObj.variableType}>" : variableObj.variableType;
 
                     if (basicTypes.Contains(variableObj.variableType))
                     {
-                        AddToFileContents($"{startOfLine}{variableObj.variableType} {variableObj.name};");
+                        AddToFileContents($"{startOfLine}{fullType} {variableObj.name};");
                     }
                     else if (nasbParserFile.enums.Any(x => x.name.Equals(variableObj.variableType)))
                     {
                         // Type is an enum contained within the class
-                        AddToFileContents($"{startOfLine}{variableObj.variableType} {variableObj.name};");
+                        AddToFileContents($"{startOfLine}{fullType} {variableObj.name};");
                     }
                     else
                     {
                         // If the name matches a nested class, we don't want to give it the [Output] attribute
                         if (nasbParserFile.nestedClasses.Any(x => x.className.Equals(variableObj.variableType)) || isNested)
                         {
-                            AddToFileContents($"{startOfLine}{variableObj.variableType} {variableObj.name};");
+                            AddToFileContents($"{startOfLine}{fullType} {variableObj.name};");
                         } else
                         {
-                            AddToFileContents($"[Output] public {variableObj.variableType} {variableObj.name};");
+                            AddToFileContents($"[Output] public {fullType} {variableObj.name};");
                         }
                     }
                 }
