@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -138,6 +138,14 @@ namespace NASB_Parser_To_xNode
                         AddToFileContents("base.Init();");
                         if (Consts.classToTypeId.ContainsKey(nasbParserFile.className))
                             AddToFileContents($"TID = TypeId.{Consts.classToTypeId[nasbParserFile.className]};");
+                    }
+                    CloseBlock();
+
+                    AddToFileContents("");
+                    AddToFileContents("public override object GetValue(NodePort port)");
+                    OpenBlock();
+                    {
+                        AddToFileContents("return null;");
                     }
                     CloseBlock();
 
