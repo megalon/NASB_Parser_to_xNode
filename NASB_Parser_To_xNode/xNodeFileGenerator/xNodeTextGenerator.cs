@@ -13,6 +13,10 @@ namespace NASB_Parser_To_xNode
         private static string fileContents;
 
         private static string[] otherImports = { "UnityEngine", "UnityEditor", "XNode", "XNodeEditor", "NASB_Parser" };
+        private static Dictionary<string, string> specialImports = new Dictionary<string, string> {
+            { "SAManipHitbox", "static NASB_Parser.StateActions.SAManipHitbox" },
+            { "SAManipHurtbox", "static NASB_Parser.StateActions.SAManipHurtbox" }
+        };
 
         public static string GenerateXNodeFileText(NASBParserFile nasbParserFile)
         {
@@ -29,6 +33,11 @@ namespace NASB_Parser_To_xNode
             foreach (string importString in otherImports)
             {
                 AddToFileContents("using " + importString + ";");
+            }
+
+            if (specialImports.ContainsKey(nasbParserFile.className))
+            {
+                AddToFileContents($"using {specialImports[nasbParserFile.className]};");
             }
 
             foreach (NASBParserFolder folder in Consts.folders)
