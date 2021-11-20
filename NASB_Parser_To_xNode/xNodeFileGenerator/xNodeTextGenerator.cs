@@ -229,18 +229,32 @@ namespace NASB_Parser_To_xNode
                                 if (Program.nasbParserFiles.Any(x => x.className.Equals(variableObj.variableType))
                                     && !Consts.enumOnlyFiles.Contains(variableObj.variableType))
                                 {
-                                    if (!variableObj.isList)
+                                    AddToFileContents($"");
+
+                                    if (variableObj.isList)
                                     {
+                                        // Create the list of nodes for this variable type and add them to the graph
+                                        AddToFileContents($"foreach ({variableObj.variableType} {variableObj.name}_item in {variableObj.name})");
+                                        OpenBlock();
+                                        {
+                                            string nodeName = $"node_{variableObj.name}";
+                                            AddToFileContents($"{variableObj.variableType}Node {nodeName} = graph.AddNode<{variableObj.variableType}Node>();");
+                                            AddToFileContents($"GetPort(\"{variableObj.name}\").Connect({nodeName}.GetPort(\"NodeInput\"));");
+                                            AddToFileContents($"AssetDatabase.AddObjectToAsset({nodeName}, assetPath);");
+                                            AddToFileContents($"{nodeName}.SetData({variableObj.name}_item, graph, assetPath, xyPos + new Vector2(Consts.NodeXOffset, (Consts.NodeHeight + Consts.NodeYOffset) * variableCount));");
+                                            AddToFileContents("++variableCount;");
+                                        }
+                                        CloseBlock();
+                                    } else {
                                         // Create the node for this variable type and add it to the graph
-                                        AddToFileContents($"");
                                         string nodeName = $"node_{variableObj.name}";
                                         AddToFileContents($"{variableObj.variableType}Node {nodeName} = graph.AddNode<{variableObj.variableType}Node>();");
                                         AddToFileContents($"GetPort(\"{variableObj.name}\").Connect({nodeName}.GetPort(\"NodeInput\"));");
                                         AddToFileContents($"AssetDatabase.AddObjectToAsset({nodeName}, assetPath);");
-                                        AddToFileContents($"{nodeName}.SetData({variableObj.name}, graph, assetPath, xyPos + new Vector2(Consts.NodeXOffset, variableCount * Consts.NodeYOffset));");
+                                        AddToFileContents($"{nodeName}.SetData({variableObj.name}, graph, assetPath, xyPos + new Vector2(Consts.NodeXOffset, (Consts.NodeHeight + Consts.NodeYOffset) * variableCount));");
                                         if (numVariables < nasbParserFile.variables.Count) AddToFileContents("++variableCount;");
-                                        AddToFileContents($"");
                                     }
+                                    AddToFileContents($"");
                                 }
                             }
                         }
