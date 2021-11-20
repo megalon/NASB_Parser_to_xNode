@@ -87,6 +87,14 @@ namespace NASB_Parser_To_xNode
                 {
                     //var accString = Utils.GetAccessabilityLevelString(variableObj.accessability);
                     var accString = "public";
+
+                    // Special case for TID and Version 
+                    if ((variableObj.name.Equals("TID") && variableObj.variableType.Equals("TypeId"))
+                        || (variableObj.name.Equals("Version") && variableObj.variableType.Equals("int")))
+                    {
+                        accString = "protected";
+                    }
+
                     var startOfLine = $"{accString} {(variableObj.isStatic ? "static " : "")}{(variableObj.isReadonly ? "readonly " : "")}";
 
                     // Handle Vector3 ambiguity
