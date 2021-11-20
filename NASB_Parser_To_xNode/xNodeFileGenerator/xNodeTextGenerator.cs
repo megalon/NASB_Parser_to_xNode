@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -173,13 +173,13 @@ namespace NASB_Parser_To_xNode
 
                                 if (variableObj.isList)
                                 {
-                                    AddToFileContents($"foreach (var {variableObj.name}_listitem in data.{variableObj.name})");
+                                    AddToFileContents($"foreach (var {variableObj.name}_item in data.{variableObj.name})");
                                     OpenBlock();
                                     {
                                         AddToFileContents($"{variableObj.variableType} temp = new {variableObj.variableType}();");
                                         foreach (VariableObj nestedVariable in nestedClass.variables)
                                         {
-                                            AddToFileContents($"temp.{nestedVariable.name} = {variableObj.name}_listitem.{nestedVariable.name};");
+                                            AddToFileContents($"temp.{nestedVariable.name} = {variableObj.name}_item.{nestedVariable.name};");
                                         }
                                         AddToFileContents($"{variableObj.name}.Add(temp);");
                                     }
