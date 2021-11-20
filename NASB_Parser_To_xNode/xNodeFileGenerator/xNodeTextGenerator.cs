@@ -53,7 +53,16 @@ namespace NASB_Parser_To_xNode
             }
 
             AddToFileContents("");
-            AddToFileContents("namespace NASB_Moveset_Editor");
+
+            string namespaceSubfolder = "";
+
+            if (nasbParserFile.@namespace != null && nasbParserFile.@namespace.Contains("NASB_Parser."))
+            {
+                namespaceSubfolder = nasbParserFile.@namespace.Substring("NASB_Parser.".Length);
+            }
+
+            AddToFileContents("namespace NASB_Moveset_Editor" + (namespaceSubfolder.Equals(string.Empty) ? "" : "." + namespaceSubfolder));
+
             OpenBlock();
             {
                 HandleClass(nasbParserFile, false);
