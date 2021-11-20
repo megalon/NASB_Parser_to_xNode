@@ -30,15 +30,9 @@ namespace NASB_Parser_To_xNode
             if (variableObj.variableType.Equals("Vector3")) variableObj.variableType = "NASB_Parser.Vector3";
 
             // Handle List
-            var fullType = variableObj.isList ? $"List<{variableObj.variableType}>" : variableObj.variableType;
+            var fullType = GetFullType(variableObj);
 
             if (Consts.basicTypes.Contains(variableObj.variableType))
-            {
-                return ($"{startOfLine}{relativeNamespace}{fullType} {variableObj.name};");
-            }
-
-            // If the name matches a nested class, we don't want to give it the [Output] attribute
-            if (nasbParserFile.nestedClasses.Any(x => x.className.Equals(variableObj.variableType)) || isNested)
             {
                 return ($"{startOfLine}{relativeNamespace}{fullType} {variableObj.name};");
             }
@@ -60,6 +54,11 @@ namespace NASB_Parser_To_xNode
             }
 
             return ($"{startOfLine}{relativeNamespace}{fullType} {variableObj.name};");
+        }
+
+        public static string GetFullType(VariableObj variableObj)
+        {
+            return (variableObj.isList ? $"List<{variableObj.variableType}>" : variableObj.variableType);
         }
     }
 }

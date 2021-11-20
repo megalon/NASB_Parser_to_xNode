@@ -17,6 +17,10 @@ namespace NASB_Parser_To_xNode
             { "SAManipHitbox", "static NASB_Parser.StateActions.SAManipHitbox" },
             { "SAManipHurtbox", "static NASB_Parser.StateActions.SAManipHurtbox" }
         };
+        private static Dictionary<string, string> specialTypes = new Dictionary<string, string>
+        {
+            { "ManipWay", "SASetFloatTarget.SetFloat.ManipWay" },
+        };
 
         public static string GenerateXNodeFileText(NASBParserFile nasbParserFile)
         {
@@ -89,28 +93,31 @@ namespace NASB_Parser_To_xNode
         {
             // AddToFileContents("[Serializable]");
 
-            string classDeclaration = $"public {(nasbParserFile.isAbstract ? "abstract " : "")}class {nasbParserFile.className}";
-            if (isNested)
+            // Fix variables with type namespace of nested class
+            foreach (VariableObj variable in nasbParserFile.variables)
             {
-                if (nasbParserFile.parentClass != null)
+                if (nasbParserFile.nestedClasses.Any(x => x.className.Equals(variable.variableType)))
                 {
-                    if (nasbParserFile.parentClass.Equals("ISerializable")) nasbParserFile.parentClass = "BaseMovesetNode";
-                    classDeclaration += $" : {nasbParserFile.parentClass}";
+                    variable.variableType = nasbParserFile.className + "." + variable.variableType;
+                }
+
+                if (specialTypes.ContainsKey(variable.variableType))
+                {
+                    variable.variableType = specialTypes[variable.variableType];
                 }
             }
-            else
+
+            string classDeclaration = $"public {(nasbParserFile.isAbstract ? "abstract " : "")}class {nasbParserFile.className}";
+            if (nasbParserFile.className.Equals("IdState"))
             {
-                if (nasbParserFile.className.Equals("IdState"))
-                {
-                    // IdState doesn't need the "[Input]" that BaseMovesetNode has
-                    classDeclaration += $"Node : Node";
-                } else if (nasbParserFile.parentClass == null || nasbParserFile.parentClass.Equals("ISerializable"))
-                {
-                    classDeclaration += $"Node : BaseMovesetNode";
-                } else
-                {
-                    classDeclaration += $"Node : {nasbParserFile.parentClass}Node";
-                }
+                // IdState doesn't need the "[Input]" that BaseMovesetNode has
+                classDeclaration += $"Node : Node";
+            } else if (nasbParserFile.parentClass == null || nasbParserFile.parentClass.Equals("ISerializable"))
+            {
+                classDeclaration += $"Node : BaseMovesetNode";
+            } else
+            {
+                classDeclaration += $"Node : {nasbParserFile.parentClass}Node";
             }
 
             AddToFileContents(classDeclaration);
@@ -121,25 +128,6 @@ namespace NASB_Parser_To_xNode
                 foreach (VariableObj variableObj in nasbParserFile.variables)
                 {
                     AddToFileContents(VariableStringGenerator.GetVariableString(variableObj, nasbParserFile, isNested));
-                }
-
-                // Enums, if this is a nested class
-                if (isNested)
-                {
-                    foreach (EnumObj enumObj in nasbParserFile.enums)
-                    {
-                        AddToFileContents("");
-                        var accString = Utils.GetAccessabilityLevelString(enumObj.accessability);
-                        AddToFileContents($"{accString} enum {enumObj.name}");
-                        OpenBlock();
-                        {
-                            foreach (string enumName in enumObj.enumNames)
-                            {
-                                AddToFileContents($"{enumName},");
-                            }
-                        }
-                        CloseBlock();
-                    }
                 }
 
                 // Node specific functions
@@ -167,6 +155,10 @@ namespace NASB_Parser_To_xNode
                     // Set all variables
                     AddToFileContents("");
 
+                    if (isNested)
+                    {
+                        nasbParserFile.className = nasbParserFile.relativePath;
+                    }
                     AddToFileContents($"public int SetData({nasbParserFile.className} data, MovesetGraph graph, string assetPath, Vector2 nodeDepthXY)");
                     OpenBlock();
                     {
