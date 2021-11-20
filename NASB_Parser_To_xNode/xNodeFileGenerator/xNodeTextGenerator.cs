@@ -95,7 +95,11 @@ namespace NASB_Parser_To_xNode
             }
             else
             {
-                if (nasbParserFile.parentClass == null || nasbParserFile.parentClass.Equals("ISerializable"))
+                if (nasbParserFile.className.Equals("IdState"))
+                {
+                    // IdState doesn't need the "[Input]" that BaseMovesetNode has
+                    classDeclaration += $"Node : Node";
+                } else if (nasbParserFile.parentClass == null || nasbParserFile.parentClass.Equals("ISerializable"))
                 {
                     classDeclaration += $"Node : BaseMovesetNode";
                 } else
@@ -146,6 +150,7 @@ namespace NASB_Parser_To_xNode
                     }
                     CloseBlock();
 
+                    // Override function to fix warning in Unity log
                     AddToFileContents("");
                     AddToFileContents("public override object GetValue(NodePort port)");
                     OpenBlock();
