@@ -13,6 +13,10 @@ namespace NASB_Parser_To_xNode
         private static string fileContents;
 
         private static string[] otherImports = { "UnityEngine", "UnityEditor", "XNode", "XNodeEditor", "NASB_Parser" };
+        private static Dictionary<string, string> specialImports = new Dictionary<string, string> {
+            { "SAManipHitbox", "static NASB_Parser.StateActions.SAManipHitbox" },
+            { "SAManipHurtbox", "static NASB_Parser.StateActions.SAManipHurtbox" }
+        };
 
         public static string GenerateXNodeFileText(NASBParserFile nasbParserFile)
         {
@@ -31,11 +35,29 @@ namespace NASB_Parser_To_xNode
                 AddToFileContents("using " + importString + ";");
             }
 
+            if (specialImports.ContainsKey(nasbParserFile.className))
+            {
+                AddToFileContents($"using {specialImports[nasbParserFile.className]};");
+            }
+
             foreach (NASBParserFolder folder in Consts.folders)
             {
                 var extraParserImport = "NASB_Parser." + folder.folderName;
                 if (!nasbParserFile.imports.Contains(extraParserImport))
                     AddToFileContents("using " + extraParserImport + ";");
+            }
+
+            if (nasbParserFile.parentClass != null
+                && !nasbParserFile.parentClass.Equals(string.Empty)
+                && !Path.GetDirectoryName(nasbParserFile.relativePath).Equals(string.Empty))
+            {
+                if (nasbParserFile.parentClass.Equals("ISerializable"))
+                {
+                    AddToFileContents($"using static {Utils.GetRelativeNamespace(nasbParserFile)};");
+                } else 
+                {
+                    Utils.RecurseThroughParentNamespaces(nasbParserFile);
+                }
             }
 
             AddToFileContents("");
@@ -87,22 +109,24 @@ namespace NASB_Parser_To_xNode
                     AddToFileContents(VariableStringGenerator.GetVariableString(variableObj, nasbParserFile, isNested));
                 }
 
-                // Enums
-                foreach (EnumObj enumObj in nasbParserFile.enums)
+                // Enums, if this is a nested class
+                if (isNested)
                 {
-                    AddToFileContents("");
-                    var accString = Utils.GetAccessabilityLevelString(enumObj.accessability);
-                    AddToFileContents($"{accString} enum {enumObj.name}");
-                    OpenBlock();
+                    foreach (EnumObj enumObj in nasbParserFile.enums)
                     {
-                        foreach (string enumName in enumObj.enumNames)
+                        AddToFileContents("");
+                        var accString = Utils.GetAccessabilityLevelString(enumObj.accessability);
+                        AddToFileContents($"{accString} enum {enumObj.name}");
+                        OpenBlock();
                         {
-                            AddToFileContents($"{enumName},");
+                            foreach (string enumName in enumObj.enumNames)
+                            {
+                                AddToFileContents($"{enumName},");
+                            }
                         }
+                        CloseBlock();
                     }
-                    CloseBlock();
                 }
-
 
                 // Node specific functions
                 if (nasbParserFile.parentClass != null)
@@ -129,7 +153,7 @@ namespace NASB_Parser_To_xNode
             CloseBlock();
         }
 
-        private static void AddToFileContents(string line)
+        public static void AddToFileContents(string line)
         {
             fileContents += indent + line + "\n";
         }
