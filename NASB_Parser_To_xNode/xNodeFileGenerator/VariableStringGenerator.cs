@@ -37,11 +37,10 @@ namespace NASB_Parser_To_xNode
                 return ($"{startOfLine}{relativeNamespace}{fullType} {variableObj.name};");
             }
 
-            // If the name matches another class file, excluding enum only classes
-            if (Program.nasbParserFiles.Any(x => x.className.Equals(variableObj.variableType))
-                && !Consts.enumOnlyFiles.Contains(variableObj.variableType))
+            // If the name matches enum only classes
+            if (Consts.enumOnlyFiles.Contains(variableObj.variableType))
             {
-                return ($"[Output] public {relativeNamespace}{fullType} {variableObj.name};");
+                return ($"{startOfLine}{relativeNamespace}{fullType} {variableObj.name};");
             }
 
             // If type is an enum contained within the class
@@ -51,9 +50,11 @@ namespace NASB_Parser_To_xNode
                 {
                     relativeNamespace = Utils.GetRelativeNamespace(nasbParserFile) + ".";
                 }
+
+                return ($"{startOfLine}{relativeNamespace}{fullType} {variableObj.name};");
             }
 
-            return ($"{startOfLine}{relativeNamespace}{fullType} {variableObj.name};");
+            return ($"[Output] public {relativeNamespace}{fullType} {variableObj.name};");
         }
 
         public static string GetFullType(VariableObj variableObj)

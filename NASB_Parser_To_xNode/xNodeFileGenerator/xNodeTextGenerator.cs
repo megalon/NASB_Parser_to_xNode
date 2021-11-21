@@ -96,14 +96,12 @@ namespace NASB_Parser_To_xNode
             // Fix variables with type namespace of nested class
             foreach (VariableObj variable in nasbParserFile.variables)
             {
-                if (nasbParserFile.nestedClasses.Any(x => x.className.Equals(variable.variableType)))
-                {
-                    variable.variableType = nasbParserFile.className + "." + variable.variableType;
-                }
-
                 if (specialTypes.ContainsKey(variable.variableType))
                 {
                     variable.variableType = specialTypes[variable.variableType];
+                } else if (nasbParserFile.nestedClasses.Any(x => x.className.Equals(variable.variableType)))
+                {
+                    variable.variableType = nasbParserFile.className + "." + variable.variableType;
                 }
             }
 
@@ -152,13 +150,14 @@ namespace NASB_Parser_To_xNode
                     }
                     CloseBlock();
 
-                    // Set all variables
                     AddToFileContents("");
 
                     if (isNested)
                     {
                         nasbParserFile.className = nasbParserFile.relativePath;
                     }
+
+                    // Set all variables
                     AddToFileContents($"public int SetData({nasbParserFile.className} data, MovesetGraph graph, string assetPath, Vector2 nodeDepthXY)");
                     OpenBlock();
                     {
@@ -166,53 +165,47 @@ namespace NASB_Parser_To_xNode
                         AddToFileContents("position.x = nodeDepthXY.x * Consts.NodeXOffset;");
                         AddToFileContents("position.y = nodeDepthXY.y * Consts.NodeYOffset;");
                         AddToFileContents("int variableCount = 0;");
+                        AddToFileContents($"");
                         int numVariables = 0;
                         foreach (VariableObj variableObj in nasbParserFile.variables)
                         {
                             ++numVariables;
-                            // Check if this is a nested class
-                            if (nasbParserFile.nestedClasses.Any(x => x.className.Equals(variableObj.variableType)))
+                            string nodeName = $"node_{variableObj.name}";
+
+                            // Get the main type for this class if it is nested
+                            var mainType = "";
+                            if(variableObj.variableType.LastIndexOf(".") > 0 && !variableObj.variableType.Equals("NASB_Parser.Vector3"))
                             {
-                                NASBParserFile nestedClass = nasbParserFile.nestedClasses.Find(x => x.className.Equals(variableObj.variableType));
-                                // We have to build a new object for the nested type
+                                mainType = variableObj.variableType.Substring(variableObj.variableType.LastIndexOf(".") + 1);
+                            }
+
+                            // If this variable is from a nested class within one of the NASB_Parser files
+                            if (nasbParserFile.nestedClasses.Any(x => x.className.Equals(mainType)))
+                            {
+                                NASBParserFile nestedClass = nasbParserFile.nestedClasses.Find(x => x.className.Equals(mainType));
 
                                 var typeToCreate = variableObj.variableType;
                                 if (variableObj.isList)
                                 {
-                                    typeToCreate = "List<" + variableObj.variableType + ">";
+                                    typeToCreate = "List<" + typeToCreate + ">";
                                 }
-
-                                AddToFileContents($"{variableObj.name} = new {typeToCreate}();");
+                                AddToFileContents($"{variableObj.name} = data.{variableObj.name};");
+                                AddToFileContents($"");
 
                                 if (variableObj.isList)
                                 {
-                                    AddToFileContents($"foreach (var {variableObj.name}_item in data.{variableObj.name})");
+                                    // Create the list of nodes for this variable type and add them to the graph
+                                    AddToFileContents($"foreach ({variableObj.variableType} {variableObj.name}_item in {variableObj.name})");
                                     OpenBlock();
                                     {
-                                        AddToFileContents($"{variableObj.variableType} temp = new {variableObj.variableType}();");
-                                        foreach (VariableObj nestedVariable in nestedClass.variables)
-                                        {
-                                            // Dumb special case cast
-                                            if (nasbParserFile.className.Equals("SASetFloatTarget") 
-                                                && variableObj.name.Equals("Sets")
-                                                && nestedVariable.name.Equals("Way"))
-                                            {
-                                                AddToFileContents($"temp.{nestedVariable.name} = (SetFloat.ManipWay){variableObj.name}_item.{nestedVariable.name};");
-                                            }
-                                            else
-                                            {
-                                                AddToFileContents($"temp.{nestedVariable.name} = {variableObj.name}_item.{nestedVariable.name};");
-                                            }
-                                        }
-                                        AddToFileContents($"{variableObj.name}.Add(temp);");
+                                        AddNodeToGraph(nodeName, variableObj, null, null, "_item");
+                                        AddToFileContents("++variableCount;");
                                     }
                                     CloseBlock();
                                 } else
                                 {
-                                    foreach (VariableObj nestedVariable in nestedClass.variables)
-                                    {
-                                        AddToFileContents($"{variableObj.name}.{nestedVariable.name} = data.{variableObj.name}.{nestedVariable.name};");
-                                    }
+                                    AddNodeToGraph(nodeName, variableObj, null, null, "");
+                                    AddToFileContents("++variableCount;");
                                 }
                             } else
                             {
@@ -230,8 +223,6 @@ namespace NASB_Parser_To_xNode
                                     else if (variableObj.variableType.Equals("Jump")) dict = Consts.jumpId;
                                     else if (variableObj.variableType.Equals("FloatSource")) dict = Consts.floatSourceIds;
                                     else if (variableObj.variableType.Equals("ObjectSource")) dict = Consts.objectSourceIds;
-
-                                    string nodeName = $"node_{variableObj.name}";
 
                                     if (variableObj.isList)
                                     {
@@ -304,7 +295,10 @@ namespace NASB_Parser_To_xNode
                 AddToFileContents($"variableCount += {nodeName}.SetData(({value}){variableObj.name}{itemText}, graph, assetPath, nodeDepthXY + new Vector2(1, variableCount));");
             } else
             {
-                AddToFileContents($"{variableObj.variableType}Node {nodeName} = graph.AddNode<{variableObj.variableType}Node>();");
+                var typeName = variableObj.variableType.IndexOf(".") < 0 
+                    ? variableObj.variableType 
+                    : variableObj.variableType.Substring(variableObj.variableType.LastIndexOf(".") + 1);
+                AddToFileContents($"{typeName}Node {nodeName} = graph.AddNode<{typeName}Node>();");
                 AddToFileContents($"GetPort(\"{variableObj.name}\").Connect({nodeName}.GetPort(\"NodeInput\"));");
                 AddToFileContents($"AssetDatabase.AddObjectToAsset({nodeName}, assetPath);");
                 AddToFileContents($"variableCount += {nodeName}.SetData({variableObj.name}{itemText}, graph, assetPath, nodeDepthXY + new Vector2(1, variableCount));");
