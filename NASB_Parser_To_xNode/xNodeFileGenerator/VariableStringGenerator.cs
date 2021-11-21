@@ -38,7 +38,9 @@ namespace NASB_Parser_To_xNode
             }
 
             // If the name matches enum only classes
-            if (Consts.enumOnlyFiles.Contains(variableObj.variableType))
+            if (Consts.enumOnlyFiles.Contains(variableObj.variableType)
+                // Special case
+                || variableObj.variableType.Equals("SASetFloatTarget.SetFloat.ManipWay"))
             {
                 return ($"{startOfLine}{relativeNamespace}{fullType} {variableObj.name};");
             }
@@ -54,12 +56,39 @@ namespace NASB_Parser_To_xNode
                 return ($"{startOfLine}{relativeNamespace}{fullType} {variableObj.name};");
             }
 
-            return ($"[Output] public {relativeNamespace}{fullType} {variableObj.name};");
+            var variableClassName = variableObj.variableType;
+            if (variableObj.variableType.IndexOf(".") > -1) variableClassName = variableObj.variableType.Substring(variableObj.variableType.LastIndexOf(".") + 1);
+            if  (FindClassIncludingNested(variableClassName))
+            {
+                return ($"[Output] public {relativeNamespace}{fullType} {variableObj.name};");
+            }
+
+            return ($"{startOfLine}{relativeNamespace}{fullType} {variableObj.name};");
         }
 
         public static string GetFullType(VariableObj variableObj)
         {
             return (variableObj.isList ? $"List<{variableObj.variableType}>" : variableObj.variableType);
+        }
+
+        public static bool FindClassIncludingNested(string className)
+        {
+            return LookForClassIncludingNestedRecursive(className, Program.nasbParserFiles);
+        }
+
+        private static bool LookForClassIncludingNestedRecursive(string className, List<NASBParserFile> parserFiles)
+        {
+            foreach(NASBParserFile file in parserFiles)
+            {
+                if (file.className.Equals(className)) return true;
+                if (file.nestedClasses != null) {
+                    if (LookForClassIncludingNestedRecursive(className, file.nestedClasses))
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
         }
     }
 }
