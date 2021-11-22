@@ -9,10 +9,12 @@ namespace NASB_Parser_To_xNode
     {
         public static void GenerateXNodeFile(string fileText, string outputDir, string relativePath)
         {
-            if (relativePath.Contains(".cs"))
+            if (relativePath.EndsWith(".cs"))
             {
                 relativePath = relativePath.Substring(0, relativePath.IndexOf(".cs"));
             }
+
+            relativePath = relativePath.Replace(".", "_");
 
             var path = Path.Combine(outputDir, $"{relativePath}Node.cs");
             var dir = Path.GetDirectoryName(path);

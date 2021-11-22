@@ -29,25 +29,30 @@ namespace NASB_Parser_To_xNode
             // Handle Vector3 ambiguity
             if (variableObj.variableType.Equals("Vector3")) variableObj.variableType = "NASB_Parser.Vector3";
 
+            // Handle HBM ambiguity
+            if (nasbParserFile.className.EndsWith("_HBM"))
+            {
+                if (variableObj.variableType.Equals("Manip"))
+                {
+                    var subStr = nasbParserFile.relativePath.Substring(nasbParserFile.relativePath.IndexOf("\\") + 1);
+                    variableObj.variableType = subStr.Substring(0, subStr.LastIndexOf(".") + 1) + "Manip";
+                }
+            }
+
             // Handle List
-            var fullType = variableObj.isList ? $"List<{variableObj.variableType}>" : variableObj.variableType;
+            var fullType = GetFullType(variableObj);
 
             if (Consts.basicTypes.Contains(variableObj.variableType))
             {
                 return ($"{startOfLine}{relativeNamespace}{fullType} {variableObj.name};");
             }
 
-            // If the name matches a nested class, we don't want to give it the [Output] attribute
-            if (nasbParserFile.nestedClasses.Any(x => x.className.Equals(variableObj.variableType)) || isNested)
+            // If the name matches enum only classes
+            if (Consts.enumOnlyFiles.Contains(variableObj.variableType)
+                // Special case
+                || variableObj.variableType.Equals("SASetFloatTarget.SetFloat.ManipWay"))
             {
                 return ($"{startOfLine}{relativeNamespace}{fullType} {variableObj.name};");
-            }
-
-            // If the name matches another class file, excluding enum only classes
-            if (Program.nasbParserFiles.Any(x => x.className.Equals(variableObj.variableType))
-                && !Consts.enumOnlyFiles.Contains(variableObj.variableType))
-            {
-                return ($"[Output] public {relativeNamespace}{fullType} {variableObj.name};");
             }
 
             // If type is an enum contained within the class
@@ -57,9 +62,43 @@ namespace NASB_Parser_To_xNode
                 {
                     relativeNamespace = Utils.GetRelativeNamespace(nasbParserFile) + ".";
                 }
+
+                return ($"{startOfLine}{relativeNamespace}{fullType} {variableObj.name};");
+            }
+
+            var variableClassName = variableObj.variableType;
+            if (variableObj.variableType.IndexOf(".") > -1) variableClassName = variableObj.variableType.Substring(variableObj.variableType.LastIndexOf(".") + 1);
+            if  (FindClassIncludingNested(variableClassName))
+            {
+                return ($"[Output] public {relativeNamespace}{fullType} {variableObj.name};");
             }
 
             return ($"{startOfLine}{relativeNamespace}{fullType} {variableObj.name};");
+        }
+
+        public static string GetFullType(VariableObj variableObj)
+        {
+            return (variableObj.isList ? $"List<{variableObj.variableType}>" : variableObj.variableType);
+        }
+
+        public static bool FindClassIncludingNested(string className)
+        {
+            return LookForClassIncludingNestedRecursive(className, Program.nasbParserFiles);
+        }
+
+        private static bool LookForClassIncludingNestedRecursive(string className, List<NASBParserFile> parserFiles)
+        {
+            foreach(NASBParserFile file in parserFiles)
+            {
+                if (file.className.Equals(className)) return true;
+                if (file.nestedClasses != null) {
+                    if (LookForClassIncludingNestedRecursive(className, file.nestedClasses))
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
         }
     }
 }
