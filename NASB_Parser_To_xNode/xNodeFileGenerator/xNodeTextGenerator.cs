@@ -165,16 +165,8 @@ namespace NASB_Parser_To_xNode
 
                     // SetData function
                     SetDataGenerator.Generate(nasbParserFile);
-
+                    AddToFileContents("");
                     GetDataGenerator.Generate(nasbParserFile);
-                }
-
-                // Handle nested classes
-                foreach (NASBParserFile nestedClass in nasbParserFile.nestedClasses)
-                {
-                    Console.WriteLine($"Found nested class {nestedClass.relativePath} for {nasbParserFile.relativePath}");
-                    //AddToFileContents("");
-                    //HandleClass(nestedClass, true);
                 }
             }
             CloseBlock();
