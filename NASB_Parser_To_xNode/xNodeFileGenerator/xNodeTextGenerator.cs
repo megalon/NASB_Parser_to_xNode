@@ -305,8 +305,6 @@ namespace NASB_Parser_To_xNode
                 if (variableObj.variableType.Contains("."))
                 {
                     typeName = typeName.Replace(".", "_");
-                } else if (variableObj.variableType.IndexOf(".") > 0) {
-                    typeName = variableObj.variableType.Substring(variableObj.variableType.LastIndexOf(".") + 1);
                 }
                 AddToFileContents($"{typeName}Node {nodeName} = graph.AddNode<{typeName}Node>();");
                 AddToFileContents($"GetPort(\"{variableObj.name}\").Connect({nodeName}.GetPort(\"NodeInput\"));");
