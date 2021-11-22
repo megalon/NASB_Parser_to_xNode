@@ -59,7 +59,6 @@ namespace NASB_Parser_To_xNode
                         AddToFileContents($"if (GetPort(\"{variableObj.name}\").ConnectionCount > 0)");
                         OpenBlock();
                         {
-                            // Generate massive switch statement
                             AddToFileContents($"{typeClassFileName}Node {nodeName} = ({typeClassFileName}Node)GetPort(\"{variableObj.name}\").GetConnection(0).node;");
                             GenerateSwitchStatement(nodeName, variableObj, dict, mainClassName, typeClassFileName, false);
                         }
@@ -73,7 +72,6 @@ namespace NASB_Parser_To_xNode
 
         private static void GenerateSwitchStatement(string nodeName, VariableObj variableObj, Dictionary<string, string> dict, string mainClassName, string typeClassFileName, bool isList)
         {
-            // Create the node for this variable type and add it to the graph
             if (dict != null)
             {
                 AddToFileContents($"switch ({nodeName}.TID)");
@@ -101,8 +99,6 @@ namespace NASB_Parser_To_xNode
             }
             else
             {
-                // Do stuff here
-                // AddNodeToGraph(nodeName, variableObj, null, null, itemText);
                 if (isList)
                 {
                     AddToFileContents($"{mainClassName}.{variableObj.name}.Add({nodeName}.GetData());");

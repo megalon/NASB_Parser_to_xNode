@@ -163,7 +163,7 @@ namespace NASB_Parser_To_xNode
                         nasbParserFile.className = nasbParserFile.relativePath.Substring(nasbParserFile.relativePath.LastIndexOf("\\") + 1);
                     }
 
-                    // SetData function
+                    // SetData and GetData functions
                     SetDataGenerator.Generate(nasbParserFile);
                     AddToFileContents("");
                     GetDataGenerator.Generate(nasbParserFile);
