@@ -105,7 +105,7 @@ namespace NASB_Parser_To_xNode
                 }
             }
 
-            if (nasbParserFile.className.Equals("HBM"))
+            if (isNested)
             {
                 nasbParserFile.className = nasbParserFile.relativePath.Replace(".", "_");
             }
@@ -301,7 +301,7 @@ namespace NASB_Parser_To_xNode
             } else
             {
                 var typeName = variableObj.variableType;
-                if (variableObj.variableType.Contains("HBM"))
+                if (variableObj.variableType.Contains("."))
                 {
                     typeName = typeName.Replace(".", "_");
                 } else if (variableObj.variableType.IndexOf(".") > 0) {
