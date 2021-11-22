@@ -18,7 +18,7 @@ namespace NASB_Parser_To_xNode
             if ((variableObj.name.Equals("TID") && variableObj.variableType.Equals("TypeId"))
                 || (variableObj.name.Equals("Version") && variableObj.variableType.Equals("int")))
             {
-                accString = "protected";
+                accString = "[HideInInspector] public";
 
                 if (variableObj.variableType.Equals("TypeId"))
                     relativeNamespace = Utils.GetRelativeNamespace(nasbParserFile) + ".";
