@@ -105,6 +105,11 @@ namespace NASB_Parser_To_xNode
                 }
             }
 
+            if (nasbParserFile.className.Equals("HBM"))
+            {
+                nasbParserFile.className = nasbParserFile.relativePath.Replace(".", "_");
+            }
+
             string classDeclaration = $"public {(nasbParserFile.isAbstract ? "abstract " : "")}class {nasbParserFile.className}";
             if (nasbParserFile.className.Equals("IdState"))
             {
@@ -157,7 +162,7 @@ namespace NASB_Parser_To_xNode
                         nasbParserFile.className = nasbParserFile.relativePath;
                     }
 
-                    // Set all variables
+                    // SetData function
                     AddToFileContents($"public int SetData({nasbParserFile.className} data, MovesetGraph graph, string assetPath, Vector2 nodeDepthXY)");
                     OpenBlock();
                     {
@@ -295,9 +300,13 @@ namespace NASB_Parser_To_xNode
                 AddToFileContents($"variableCount += {nodeName}.SetData(({value}){variableObj.name}{itemText}, graph, assetPath, nodeDepthXY + new Vector2(1, variableCount));");
             } else
             {
-                var typeName = variableObj.variableType.IndexOf(".") < 0 
-                    ? variableObj.variableType 
-                    : variableObj.variableType.Substring(variableObj.variableType.LastIndexOf(".") + 1);
+                var typeName = variableObj.variableType;
+                if (variableObj.variableType.Contains("HBM"))
+                {
+                    typeName = typeName.Replace(".", "_");
+                } else if (variableObj.variableType.IndexOf(".") > 0) {
+                    typeName = variableObj.variableType.Substring(variableObj.variableType.LastIndexOf(".") + 1);
+                }
                 AddToFileContents($"{typeName}Node {nodeName} = graph.AddNode<{typeName}Node>();");
                 AddToFileContents($"GetPort(\"{variableObj.name}\").Connect({nodeName}.GetPort(\"NodeInput\"));");
                 AddToFileContents($"AssetDatabase.AddObjectToAsset({nodeName}, assetPath);");

@@ -29,6 +29,15 @@ namespace NASB_Parser_To_xNode
             // Handle Vector3 ambiguity
             if (variableObj.variableType.Equals("Vector3")) variableObj.variableType = "NASB_Parser.Vector3";
 
+            // Handle HBM ambiguity
+            if (nasbParserFile.className.EndsWith("_HBM"))
+            {
+                if (variableObj.variableType.Equals("Manip"))
+                {
+                    variableObj.variableType = nasbParserFile.relativePath.Substring(0, nasbParserFile.relativePath.LastIndexOf(".") + 1) + "Manip";
+                }
+            }
+
             // Handle List
             var fullType = GetFullType(variableObj);
 
