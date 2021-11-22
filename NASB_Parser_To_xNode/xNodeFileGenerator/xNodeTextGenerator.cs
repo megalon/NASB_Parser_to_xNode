@@ -22,7 +22,7 @@ namespace NASB_Parser_To_xNode
             { "ManipWay", "SASetFloatTarget.SetFloat.ManipWay" },
         };
 
-        public static string GenerateXNodeFileText(NASBParserFile nasbParserFile)
+        public static string GenerateXNodeFileText(NASBParserFile nasbParserFile, bool isNested)
         {
             fileContents = "";
             indentCount = 0;
@@ -82,7 +82,7 @@ namespace NASB_Parser_To_xNode
 
             OpenBlock();
             {
-                HandleClass(nasbParserFile, false);
+                HandleClass(nasbParserFile, isNested);
             }
             CloseBlock();
 
@@ -250,9 +250,9 @@ namespace NASB_Parser_To_xNode
                 // Handle nested classes
                 foreach (NASBParserFile nestedClass in nasbParserFile.nestedClasses)
                 {
-                    Console.WriteLine($"Writing nested class {nestedClass.relativePath} for {nasbParserFile.relativePath}");
-                    AddToFileContents("");
-                    HandleClass(nestedClass, true);
+                    Console.WriteLine($"Found nested class {nestedClass.relativePath} for {nasbParserFile.relativePath}");
+                    //AddToFileContents("");
+                    //HandleClass(nestedClass, true);
                 }
             }
             CloseBlock();

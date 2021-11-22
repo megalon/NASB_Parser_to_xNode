@@ -23,8 +23,14 @@ namespace NASB_Parser_To_xNode
         {
             foreach (NASBParserFile nasbParserFile in nasbParserFiles)
             {
-                string fileText = xNodeTextGenerator.GenerateXNodeFileText(nasbParserFile);
+                string fileText = xNodeTextGenerator.GenerateXNodeFileText(nasbParserFile, false);
                 xNodeFileGenerator.GenerateXNodeFile(fileText, outputPath, nasbParserFile.relativePath);
+
+                foreach (NASBParserFile nestedFile in nasbParserFile.nestedClasses)
+                {
+                    fileText = xNodeTextGenerator.GenerateXNodeFileText(nestedFile, true);
+                    xNodeFileGenerator.GenerateXNodeFile(fileText, outputPath, nestedFile.relativePath);
+                }
             }
         }
 
