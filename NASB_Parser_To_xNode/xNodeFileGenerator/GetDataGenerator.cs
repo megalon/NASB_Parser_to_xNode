@@ -15,6 +15,13 @@ namespace NASB_Parser_To_xNode
             {
                 var mainClassName = "objToReturn";
                 AddToFileContents($"{nasbParserFile.className} {mainClassName} = new {nasbParserFile.className}();");
+
+                if (nasbParserFile.parentClass != null && (Consts.classToTypeId.ContainsKey(nasbParserFile.className)))
+                {
+                    AddToFileContents($"{mainClassName}.TID = TypeId.{Consts.classToTypeId[nasbParserFile.className]};");
+                    AddToFileContents($"{mainClassName}.Version = Version;");
+                }
+
                 foreach (VariableObj variableObj in nasbParserFile.variables)
                 {
 
