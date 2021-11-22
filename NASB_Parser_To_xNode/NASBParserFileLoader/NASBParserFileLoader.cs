@@ -164,7 +164,8 @@ namespace NASB_Parser_To_xNode
                             case ReadingThing.Class:
                                 NASBParserFile nestedClass = new NASBParserFile();
                                 ReadClass(sr, line, nestedClass);
-                                nestedClass.relativePath = nasbParserFile.className + "." + nestedClass.className;
+                                var subStr = nasbParserFile.relativePath.Substring(0, nasbParserFile.relativePath.IndexOf(".cs"));
+                                nestedClass.relativePath = subStr + "." + nestedClass.className;
                                 nasbParserFile.nestedClasses.Add(nestedClass);
                                 break;
                             case ReadingThing.Enum:

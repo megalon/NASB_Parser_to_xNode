@@ -62,7 +62,7 @@ namespace NASB_Parser_To_xNode
             {
                 if (nasbParserFile.parentClass.Equals("ISerializable"))
                 {
-                    AddToFileContents($"using static {Utils.GetRelativeNamespace(nasbParserFile)};");
+                    if (!isNested) AddToFileContents($"using static {Utils.GetRelativeNamespace(nasbParserFile)};");
                 } else 
                 {
                     Utils.RecurseThroughParentNamespaces(nasbParserFile);
@@ -108,6 +108,7 @@ namespace NASB_Parser_To_xNode
             if (isNested)
             {
                 nasbParserFile.className = nasbParserFile.relativePath.Replace(".", "_");
+                nasbParserFile.className = nasbParserFile.className.Substring(nasbParserFile.className.LastIndexOf("\\") + 1);
             }
 
             string classDeclaration = $"public {(nasbParserFile.isAbstract ? "abstract " : "")}class {nasbParserFile.className}";
@@ -159,7 +160,7 @@ namespace NASB_Parser_To_xNode
 
                     if (isNested)
                     {
-                        nasbParserFile.className = nasbParserFile.relativePath;
+                        nasbParserFile.className = nasbParserFile.relativePath.Substring(nasbParserFile.relativePath.LastIndexOf("\\") + 1);
                     }
 
                     // SetData function

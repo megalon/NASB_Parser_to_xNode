@@ -34,7 +34,8 @@ namespace NASB_Parser_To_xNode
             {
                 if (variableObj.variableType.Equals("Manip"))
                 {
-                    variableObj.variableType = nasbParserFile.relativePath.Substring(0, nasbParserFile.relativePath.LastIndexOf(".") + 1) + "Manip";
+                    var subStr = nasbParserFile.relativePath.Substring(nasbParserFile.relativePath.IndexOf("\\") + 1);
+                    variableObj.variableType = subStr.Substring(0, subStr.LastIndexOf(".") + 1) + "Manip";
                 }
             }
 
