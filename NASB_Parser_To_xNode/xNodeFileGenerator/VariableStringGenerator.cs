@@ -18,7 +18,7 @@ namespace NASB_Parser_To_xNode
             if ((variableObj.name.Equals("TID") && variableObj.variableType.Equals("TypeId"))
                 || (variableObj.name.Equals("Version") && variableObj.variableType.Equals("int")))
             {
-                accString = "protected";
+                accString = "[HideInInspector] public";
 
                 if (variableObj.variableType.Equals("TypeId"))
                     relativeNamespace = Utils.GetRelativeNamespace(nasbParserFile) + ".";
@@ -70,6 +70,7 @@ namespace NASB_Parser_To_xNode
             if (variableObj.variableType.IndexOf(".") > -1) variableClassName = variableObj.variableType.Substring(variableObj.variableType.LastIndexOf(".") + 1);
             if  (FindClassIncludingNested(variableClassName))
             {
+                variableObj.isOutput = true;
                 return ($"[Output] public {relativeNamespace}{fullType} {variableObj.name};");
             }
 
