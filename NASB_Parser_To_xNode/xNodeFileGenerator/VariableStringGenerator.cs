@@ -70,6 +70,7 @@ namespace NASB_Parser_To_xNode
             if (variableObj.variableType.IndexOf(".") > -1) variableClassName = variableObj.variableType.Substring(variableObj.variableType.LastIndexOf(".") + 1);
             if  (FindClassIncludingNested(variableClassName))
             {
+                variableObj.isOutput = true;
                 return ($"[Output] public {relativeNamespace}{fullType} {variableObj.name};");
             }
 

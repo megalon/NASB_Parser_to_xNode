@@ -165,6 +165,8 @@ namespace NASB_Parser_To_xNode
 
                     // SetData function
                     SetDataGenerator.Generate(nasbParserFile);
+
+                    GetDataGenerator.Generate(nasbParserFile);
                 }
 
                 // Handle nested classes
