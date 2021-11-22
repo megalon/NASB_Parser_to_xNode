@@ -14,6 +14,8 @@ namespace NASB_Parser_To_xNode
                 relativePath = relativePath.Substring(0, relativePath.IndexOf(".cs"));
             }
 
+            relativePath = relativePath.Replace(".", "_");
+
             var path = Path.Combine(outputDir, $"{relativePath}Node.cs");
             var dir = Path.GetDirectoryName(path);
 
