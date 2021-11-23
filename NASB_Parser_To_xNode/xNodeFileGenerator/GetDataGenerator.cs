@@ -10,13 +10,18 @@ namespace NASB_Parser_To_xNode
     {
         public static void Generate(NASBParserFile nasbParserFile)
         {
-            AddToFileContents($"public new {nasbParserFile.className} GetData()");
+            bool classWithTID = false;
+            if (nasbParserFile.parentClass != null && (Consts.classToTypeId.ContainsKey(nasbParserFile.className)))
+            {
+                classWithTID = true;
+            }
+            AddToFileContents($"public {(classWithTID ? "new " : "")}{nasbParserFile.className} GetData()");
             OpenBlock();
             {
                 var mainClassName = "objToReturn";
                 AddToFileContents($"{nasbParserFile.className} {mainClassName} = new {nasbParserFile.className}();");
 
-                if (nasbParserFile.parentClass != null && (Consts.classToTypeId.ContainsKey(nasbParserFile.className)))
+                if (classWithTID)
                 {
                     AddToFileContents($"{mainClassName}.TID = TypeId.{Consts.classToTypeId[nasbParserFile.className]};");
                     AddToFileContents($"{mainClassName}.Version = Version;");
