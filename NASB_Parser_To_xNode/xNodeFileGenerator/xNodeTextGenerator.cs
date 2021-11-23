@@ -149,6 +149,12 @@ namespace NASB_Parser_To_xNode
                         AddToFileContents("base.Init();");
                         if (Consts.classToTypeId.ContainsKey(nasbParserFile.className))
                             AddToFileContents($"TID = TypeId.{Consts.classToTypeId[nasbParserFile.className]};");
+
+                        if (nasbParserFile.className.Equals("InputValidator"))
+                        {
+                            AddToFileContents("// InputValidator should default to Inside, since zero is unused");
+                            AddToFileContents($"SegCompare = CtrlSegCompare.Inside;");
+                        }
                     }
                     CloseBlock();
 
