@@ -6,6 +6,15 @@ namespace NASB_Parser_To_xNode
 {
     public static class Consts
     {
+
+        public static List<string> commentHeaderText = new List<string>{
+            "",
+            "",
+            "This file was generated using NASB_Parser_to_xNode by megalon2d",
+            "https://github.com/megalon/NASB_Parser_to_xNode",
+            "",
+            "",
+        };
         public static void GenerateClassToTypeIdDict()
         {
             // Generate dictionary where class name is mapped to type id

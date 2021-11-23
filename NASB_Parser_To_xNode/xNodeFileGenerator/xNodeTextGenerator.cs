@@ -28,6 +28,11 @@ namespace NASB_Parser_To_xNode
             indentCount = 0;
             indent = "";
 
+            foreach(string commentLine in Consts.commentHeaderText)
+            {
+                AddToFileContents("// * " + commentLine);
+            }
+
             // Imports
             foreach (string importString in nasbParserFile.imports)
             {
