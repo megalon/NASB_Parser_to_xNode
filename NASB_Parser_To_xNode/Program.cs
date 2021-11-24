@@ -13,7 +13,7 @@ namespace NASB_Parser_To_xNode
             Consts.GenerateClassToTypeIdDict();
 
             string mainPath = "D:/megalon-github/NASB/NASB_Parser/NASB_Parser/";
-            string outputPath = "D:/UnityProjects/NASB-Character-NodeEditor/Assets/NASB Moveset Editor/Scripts/Nodes";
+            string outputPath = "D:/UnityProjects/NASB-Character-NodeEditor/Assets/Editor/NASB Moveset Editor/Scripts/Nodes";
 
             LoadAllNASBClasses(mainPath);
             WriteAllXNodeFiles(outputPath);
