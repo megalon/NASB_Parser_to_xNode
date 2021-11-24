@@ -56,7 +56,7 @@ namespace NASB_Parser_To_xNode
 
         public static List<string> looseFiles = new List<string>{ "AgentState", "IdState", "TimedAction", "SerialMoveset", "TimedAction" };
 
-        public static List<string> enumOnlyFiles = new List<string> { "GIEV", "HurtType", "AnimConfig", "Ease" };
+        public static List<string> enumOnlyFiles = new List<string> { "GIEV", "HurtType", "Ease" };
 
         public static Dictionary<string, string> classesToNamespaces = new Dictionary<string, string> {
             {"FloatSource", "FloatSources"},
