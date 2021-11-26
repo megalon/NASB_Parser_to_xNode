@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -89,7 +89,7 @@ namespace NASB_Parser_To_xNode
                             if (variableObj.isList)
                             {
                                 // Create the list of nodes for this variable type and add them to the graph
-                                AddToFileContents($"foreach ({variableObj.variableType} {variableObj.name}_item in {variableObj.name})");
+                                AddToFileContents($"foreach ({variableObj.variableType} {variableObj.name}_item in data.{variableObj.name})");
                                 OpenBlock();
                                 {
                                     if (isSAOrderedSensitive)
