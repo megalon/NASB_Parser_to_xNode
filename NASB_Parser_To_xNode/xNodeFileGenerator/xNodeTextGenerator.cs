@@ -140,7 +140,11 @@ namespace NASB_Parser_To_xNode
                 foreach (VariableObj variableObj in nasbParserFile.variables)
                 {
                     // Skip the "Actions" variable for SAOrderedSensitive
-                    if (isSAOrderedSensitive && variableObj.name.Equals("Actions")) continue;
+                    if (isSAOrderedSensitive && variableObj.name.Equals("Actions"))
+                    {
+                        AddToFileContents("public int listSize = 0;");
+                        continue;
+                    }
 
                     AddToFileContents(VariableStringGenerator.GetVariableString(variableObj, nasbParserFile, isNested));
                 }

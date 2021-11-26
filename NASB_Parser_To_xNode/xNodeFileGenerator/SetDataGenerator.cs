@@ -68,7 +68,10 @@ namespace NASB_Parser_To_xNode
                     }
                     else
                     {
-                        if (!isSAOrderedSensitive && !variableObj.name.Equals("Actions")) 
+                        if (isSAOrderedSensitive && variableObj.name.Equals("Actions"))
+                        {
+                            AddToFileContents("listSize = data.Actions.Count;");
+                        } else
                         {
                             AddToFileContents($"{variableObj.name} = data.{variableObj.name};");
                         }
