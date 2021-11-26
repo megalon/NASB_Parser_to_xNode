@@ -8,9 +8,12 @@ namespace NASB_Parser_To_xNode
 {
     public static class GetDataGenerator
     {
+        private static bool isSAOrderedSensitive;
         public static void Generate(NASBParserFile nasbParserFile)
         {
+            isSAOrderedSensitive = nasbParserFile.className.Equals("SAOrderedSensitive");
             bool classWithTID = false;
+
             if (nasbParserFile.parentClass != null && (Consts.classToTypeId.ContainsKey(nasbParserFile.className)))
             {
                 classWithTID = true;
@@ -61,12 +64,19 @@ namespace NASB_Parser_To_xNode
 
                     if (variableObj.isList)
                     {
-                        AddToFileContents($"foreach(NodePort port in GetPort(\"{variableObj.name}\").GetConnections())");
-                        OpenBlock();
+                        if (isSAOrderedSensitive)
                         {
-                            AddToFileContents($"{typeClassFileName}Node {nodeName} = ({typeClassFileName}Node)port.node;");
-                            GenerateSwitchStatement(nodeName, variableObj, dict, mainClassName, typeClassFileName, true);
+                            AddToFileContents($"foreach(NodePort port in DynamicOutputs)");
+                            OpenBlock();
+                                AddToFileContents("if (port.ConnectionCount <= 0) continue;");
+                                AddToFileContents($"{typeClassFileName}Node {nodeName} = ({typeClassFileName}Node)port.Connection.node;");
+                        } else
+                        {
+                            AddToFileContents($"foreach(NodePort port in GetPort(\"{variableObj.name}\").GetConnections())");
+                            OpenBlock();
+                                AddToFileContents($"{typeClassFileName}Node {nodeName} = ({typeClassFileName}Node)port.node;");
                         }
+                        GenerateSwitchStatement(nodeName, variableObj, dict, mainClassName, typeClassFileName, true);
                         CloseBlock();
                     } else
                     {
@@ -97,7 +107,13 @@ namespace NASB_Parser_To_xNode
                     {
                         if (isList)
                         {
-                            AddToFileContents($"{dict[key]}Node {key}_{nodeName} = ({dict[key]}Node)port.node;");
+                            if (isSAOrderedSensitive)
+                            {
+                                AddToFileContents($"{dict[key]}Node {key}_{nodeName} = ({dict[key]}Node)port.Connection.node;");
+                            } else
+                            {
+                                AddToFileContents($"{dict[key]}Node {key}_{nodeName} = ({dict[key]}Node)port.node;");
+                            }
                             AddToFileContents($"{mainClassName}.{variableObj.name}.Add({key}_{nodeName}.GetData());");
                         } else
                         {
@@ -107,7 +123,6 @@ namespace NASB_Parser_To_xNode
                     }
                     UpdateIndent(-1);
                     AddToFileContents($"break;");
-
                 }
                 CloseBlock();
             }

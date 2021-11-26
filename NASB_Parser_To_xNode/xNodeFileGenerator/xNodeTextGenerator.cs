@@ -142,6 +142,7 @@ namespace NASB_Parser_To_xNode
                     // Skip the "Actions" variable for SAOrderedSensitive
                     if (isSAOrderedSensitive && variableObj.name.Equals("Actions"))
                     {
+                        variableObj.isOutput = true;
                         AddToFileContents("public int listSize = 0;");
                         continue;
                     }
