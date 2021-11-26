@@ -98,7 +98,7 @@ namespace NASB_Parser_To_xNode
                                     if (isSAOrderedSensitive)
                                     {
                                         AddToFileContents("// Create dynamic ports based on number of actions");
-                                        AddToFileContents("string portName = \"\" + DynamicPorts.Count();");
+                                        AddToFileContents("string portName = \"\" + (DynamicPorts.Count() + 1);");
                                         AddToFileContents("AddDynamicOutput(typeof(StateAction), ConnectionType.Override, TypeConstraint.None, portName);");
                                         AddToFileContents("");
                                     }
