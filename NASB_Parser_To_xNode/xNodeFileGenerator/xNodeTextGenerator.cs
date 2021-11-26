@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -97,6 +97,8 @@ namespace NASB_Parser_To_xNode
 
         private static void HandleClass(NASBParserFile nasbParserFile, bool isNested)
         {
+            bool isSAOrderedSensitive = nasbParserFile.className.Equals("SAOrderedSensitive");
+
             // AddToFileContents("[Serializable]");
 
             // Fix variables with type namespace of nested class
@@ -137,6 +139,9 @@ namespace NASB_Parser_To_xNode
                 // Variables
                 foreach (VariableObj variableObj in nasbParserFile.variables)
                 {
+                    // Skip the "Actions" variable for SAOrderedSensitive
+                    if (isSAOrderedSensitive && variableObj.name.Equals("Actions")) continue;
+
                     AddToFileContents(VariableStringGenerator.GetVariableString(variableObj, nasbParserFile, isNested));
                 }
 
