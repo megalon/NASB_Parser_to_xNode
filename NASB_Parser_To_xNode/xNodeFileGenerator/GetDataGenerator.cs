@@ -15,7 +15,16 @@ namespace NASB_Parser_To_xNode
             {
                 classWithTID = true;
             }
-            AddToFileContents($"public {(classWithTID ? "new " : "")}{nasbParserFile.className} GetData()");
+
+            if (classWithTID && nasbParserFile.parentClass.Equals("ISerializable"))
+            {
+                AddToFileContents($"public {nasbParserFile.className} GetData()");
+            }
+            else
+            {
+                AddToFileContents($"public {(classWithTID ? "new " : "")}{nasbParserFile.className} GetData()");
+            }
+
             OpenBlock();
             {
                 var mainClassName = "objToReturn";
