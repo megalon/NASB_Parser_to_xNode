@@ -143,7 +143,7 @@ namespace NASB_Parser_To_xNode
                     if (isSAOrderedSensitive && variableObj.name.Equals("Actions"))
                     {
                         variableObj.isOutput = true;
-                        AddToFileContents("public int listSize = 0;");
+                        AddToFileContents("[Range(2, 50)] public int listSize = 0;");
                         continue;
                     }
 
