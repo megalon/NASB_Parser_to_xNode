@@ -15,7 +15,8 @@ namespace NASB_Parser_To_xNode
         private static string[] otherImports = { "UnityEngine", "UnityEditor", "XNode", "XNodeEditor", "NASB_Parser" };
         private static Dictionary<string, string> specialImports = new Dictionary<string, string> {
             { "SAManipHitbox", "static NASB_Parser.StateActions.SAManipHitbox" },
-            { "SAManipHurtbox", "static NASB_Parser.StateActions.SAManipHurtbox" }
+            { "SAManipHurtbox", "static NASB_Parser.StateActions.SAManipHurtbox" },
+            { "SAOrderedSensitive", "System.Linq" }
         };
         private static Dictionary<string, string> specialTypes = new Dictionary<string, string>
         {
@@ -96,6 +97,8 @@ namespace NASB_Parser_To_xNode
 
         private static void HandleClass(NASBParserFile nasbParserFile, bool isNested)
         {
+            bool isSAOrderedSensitive = nasbParserFile.className.Equals("SAOrderedSensitive");
+
             // AddToFileContents("[Serializable]");
 
             // Fix variables with type namespace of nested class
@@ -136,6 +139,14 @@ namespace NASB_Parser_To_xNode
                 // Variables
                 foreach (VariableObj variableObj in nasbParserFile.variables)
                 {
+                    // Skip the "Actions" variable for SAOrderedSensitive
+                    if (isSAOrderedSensitive && variableObj.name.Equals("Actions"))
+                    {
+                        variableObj.isOutput = true;
+                        AddToFileContents("[Range(2, 50)] public int listSize = 0;");
+                        continue;
+                    }
+
                     AddToFileContents(VariableStringGenerator.GetVariableString(variableObj, nasbParserFile, isNested));
                 }
 

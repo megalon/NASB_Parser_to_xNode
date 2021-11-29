@@ -8,8 +8,13 @@ namespace NASB_Parser_To_xNode
 {
     public static class SetDataGenerator
     {
+        private static bool isSAOrderedSensitive;
         public static void Generate(NASBParserFile nasbParserFile)
         {
+            // SAOrderedSensitive is treated differently because we need dynamic ports to
+            // show the number of connections
+            isSAOrderedSensitive = nasbParserFile.className.Equals("SAOrderedSensitive");
+
             AddToFileContents($"public int SetData({nasbParserFile.className} data, MovesetGraph graph, string assetPath, Vector2 nodeDepthXY)");
             OpenBlock();
             {
@@ -63,7 +68,13 @@ namespace NASB_Parser_To_xNode
                     }
                     else
                     {
-                        AddToFileContents($"{variableObj.name} = data.{variableObj.name};");
+                        if (isSAOrderedSensitive && variableObj.name.Equals("Actions"))
+                        {
+                            AddToFileContents("listSize = data.Actions.Count;");
+                        } else
+                        {
+                            AddToFileContents($"{variableObj.name} = data.{variableObj.name};");
+                        }
 
                         // If this variable is a class in the NASB_Parser, excluding enum only classes
                         if (Program.nasbParserFiles.Any(x => x.className.Equals(variableObj.variableType))
@@ -81,9 +92,17 @@ namespace NASB_Parser_To_xNode
                             if (variableObj.isList)
                             {
                                 // Create the list of nodes for this variable type and add them to the graph
-                                AddToFileContents($"foreach ({variableObj.variableType} {variableObj.name}_item in {variableObj.name})");
+                                AddToFileContents($"foreach ({variableObj.variableType} {variableObj.name}_item in data.{variableObj.name})");
                                 OpenBlock();
                                 {
+                                    if (isSAOrderedSensitive)
+                                    {
+                                        AddToFileContents("// Create dynamic ports based on number of actions");
+                                        AddToFileContents("string portName = \"\" + (DynamicPorts.Count() + 1);");
+                                        AddToFileContents("AddDynamicOutput(typeof(StateAction), ConnectionType.Override, TypeConstraint.None, portName);");
+                                        AddToFileContents("");
+                                    }
+
                                     GenerateSwitchStatement(nodeName, variableObj, dict, "_item");
                                     AddToFileContents("++variableCount;");
                                 }
@@ -135,7 +154,16 @@ namespace NASB_Parser_To_xNode
             {
                 nodeName = $"{key}_{nodeName}";
                 AddToFileContents($"{value}Node {nodeName} = graph.AddNode<{value}Node>();");
-                AddToFileContents($"GetPort(\"{variableObj.name}\").Connect({nodeName}.GetPort(\"NodeInput\"));");
+
+                if (isSAOrderedSensitive)
+                {
+                    // Connect dynamic port to new node
+                    AddToFileContents($"GetPort(portName).Connect({nodeName}.GetPort(\"NodeInput\"));");
+                } else
+                {
+                    AddToFileContents($"GetPort(\"{variableObj.name}\").Connect({nodeName}.GetPort(\"NodeInput\"));");
+                }
+
                 AddToFileContents($"AssetDatabase.AddObjectToAsset({nodeName}, assetPath);");
                 AddToFileContents($"variableCount += {nodeName}.SetData(({value}){variableObj.name}{itemText}, graph, assetPath, nodeDepthXY + new Vector2(1, variableCount));");
             }
