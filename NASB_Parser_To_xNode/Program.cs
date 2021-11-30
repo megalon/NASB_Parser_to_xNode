@@ -23,11 +23,17 @@ namespace NASB_Parser_To_xNode
         {
             foreach (NASBParserFile nasbParserFile in nasbParserFiles)
             {
+                if (Consts.classesToIgnore.Contains(nasbParserFile.className)) continue;
+                if (Consts.enumOnlyFiles.Contains(nasbParserFile.className)) continue;
+
                 string fileText = xNodeTextGenerator.GenerateXNodeFileText(nasbParserFile, false);
                 xNodeFileGenerator.GenerateXNodeFile(fileText, outputPath, nasbParserFile.relativePath);
 
                 foreach (NASBParserFile nestedFile in nasbParserFile.nestedClasses)
                 {
+                    if (Consts.classesToIgnore.Contains(nestedFile.className)) continue;
+                    if (Consts.enumOnlyFiles.Contains(nasbParserFile.className)) continue;
+
                     fileText = xNodeTextGenerator.GenerateXNodeFileText(nestedFile, true);
                     xNodeFileGenerator.GenerateXNodeFile(fileText, outputPath, nestedFile.relativePath);
                 }

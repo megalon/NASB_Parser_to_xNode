@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -115,6 +115,8 @@ namespace NASB_Parser_To_xNode
 
             if (isNested)
             {
+                var parentFolder = nasbParserFile.relativePath.Substring(0, nasbParserFile.relativePath.LastIndexOf("\\"));
+                nasbParserFile.parentClass = Consts.classesToNamespaces.First(x => x.Value.Equals(parentFolder)).Key;
                 nasbParserFile.className = nasbParserFile.relativePath.Replace(".", "_");
                 nasbParserFile.className = nasbParserFile.className.Substring(nasbParserFile.className.LastIndexOf("\\") + 1);
             }
@@ -148,6 +150,11 @@ namespace NASB_Parser_To_xNode
                     }
 
                     AddToFileContents(VariableStringGenerator.GetVariableString(variableObj, nasbParserFile, isNested));
+                }
+
+                if (nasbParserFile.className.Contains("MessageDynamicNode"))
+                {
+                    Console.WriteLine("testing");
                 }
 
                 // Node specific functions
