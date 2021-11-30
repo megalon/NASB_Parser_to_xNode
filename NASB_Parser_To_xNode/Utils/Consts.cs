@@ -58,6 +58,8 @@ namespace NASB_Parser_To_xNode
 
         public static List<string> enumOnlyFiles = new List<string> { "GIEV", "HurtType", "Ease" };
 
+        public static List<string> classesToIgnore = new List<string> { "BitUtil" };
+
         public static Dictionary<string, string> classesToNamespaces = new Dictionary<string, string> {
             {"FloatSource", "FloatSources"},
             {"Jump", "Jumps"},
