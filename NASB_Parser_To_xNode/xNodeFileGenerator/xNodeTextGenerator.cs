@@ -160,11 +160,6 @@ namespace NASB_Parser_To_xNode
                     AddToFileContents(VariableStringGenerator.GetVariableString(variableObj, nasbParserFile, isNested));
                 }
 
-                if (nasbParserFile.className.Contains("MessageDynamicNode"))
-                {
-                    Console.WriteLine("testing");
-                }
-
                 // Node specific functions
                 if (nasbParserFile.parentClass != null)
                 {
