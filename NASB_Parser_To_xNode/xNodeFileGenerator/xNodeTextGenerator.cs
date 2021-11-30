@@ -119,6 +119,14 @@ namespace NASB_Parser_To_xNode
                 nasbParserFile.parentClass = Consts.classesToNamespaces.First(x => x.Value.Equals(parentFolder)).Key;
                 nasbParserFile.className = nasbParserFile.relativePath.Replace(".", "_");
                 nasbParserFile.className = nasbParserFile.className.Substring(nasbParserFile.className.LastIndexOf("\\") + 1);
+            } else if (
+                nasbParserFile.relativePath.Contains("\\") 
+                && nasbParserFile.parentClass.Equals("ISerializable")
+                && !Consts.classesToNamespaces.ContainsKey(nasbParserFile.className))
+            {
+                // Set parent class for loose files in folders
+                var parentFolder = nasbParserFile.relativePath.Substring(0, nasbParserFile.relativePath.LastIndexOf("\\"));
+                nasbParserFile.parentClass = Consts.classesToNamespaces.First(x => x.Value.Equals(parentFolder)).Key;
             }
 
             string classDeclaration = $"public {(nasbParserFile.isAbstract ? "abstract " : "")}class {nasbParserFile.className}";
