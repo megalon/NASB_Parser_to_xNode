@@ -99,8 +99,6 @@ namespace NASB_Parser_To_xNode
         {
             bool isSAOrderedSensitive = nasbParserFile.className.Equals("SAOrderedSensitive");
 
-            // AddToFileContents("[Serializable]");
-
             // Fix variables with type namespace of nested class
             foreach (VariableObj variable in nasbParserFile.variables)
             {
@@ -115,6 +113,7 @@ namespace NASB_Parser_To_xNode
 
             if (isNested)
             {
+                // Replace . with _ for nested class names
                 var parentFolder = nasbParserFile.relativePath.Substring(0, nasbParserFile.relativePath.LastIndexOf("\\"));
                 nasbParserFile.parentClass = Consts.classesToNamespaces.First(x => x.Value.Equals(parentFolder)).Key;
                 nasbParserFile.className = nasbParserFile.relativePath.Replace(".", "_");
@@ -132,7 +131,7 @@ namespace NASB_Parser_To_xNode
             string classDeclaration = $"public {(nasbParserFile.isAbstract ? "abstract " : "")}class {nasbParserFile.className}";
             if (nasbParserFile.className.Equals("IdState"))
             {
-                // IdState doesn't need the "[Input]" that BaseMovesetNode has
+                // IdState doesn't need the "[Input]" that BaseMovesetNode has, so just inherit from default Node
                 classDeclaration += $"Node : Node";
             } else if (nasbParserFile.parentClass == null || nasbParserFile.parentClass.Equals("ISerializable"))
             {
@@ -152,6 +151,7 @@ namespace NASB_Parser_To_xNode
                     // Skip the "Actions" variable for SAOrderedSensitive
                     if (isSAOrderedSensitive && variableObj.name.Equals("Actions"))
                     {
+                        // Add the listSize variable, and set it to an output
                         variableObj.isOutput = true;
                         AddToFileContents("[Range(2, 50)] public int listSize = 0;");
                         continue;
@@ -179,7 +179,7 @@ namespace NASB_Parser_To_xNode
                     }
                     CloseBlock();
 
-                    // Override function to fix warning in Unity log
+                    // Override GetValue function to fix warning in Unity log
                     AddToFileContents("");
                     AddToFileContents("public override object GetValue(NodePort port)");
                     OpenBlock();
