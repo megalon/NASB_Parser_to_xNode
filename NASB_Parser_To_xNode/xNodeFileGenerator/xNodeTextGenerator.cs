@@ -145,6 +145,14 @@ namespace NASB_Parser_To_xNode
 
             OpenBlock();
             {
+                if (!nasbParserFile.className.Equals("IdState"))
+                {
+                    if (nasbParserFile.parentClass == null || nasbParserFile.parentClass.Equals("ISerializable"))
+                    {
+                        AddToFileContents($"[Input] public {nasbParserFile.className} NodeInput;");
+                    }
+                }
+
                 // Variables
                 foreach (VariableObj variableObj in nasbParserFile.variables)
                 {
