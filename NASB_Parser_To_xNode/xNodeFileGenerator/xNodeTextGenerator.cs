@@ -149,7 +149,7 @@ namespace NASB_Parser_To_xNode
                 {
                     if (nasbParserFile.parentClass == null || nasbParserFile.parentClass.Equals("ISerializable"))
                     {
-                        AddToFileContents($"[Input] public {nasbParserFile.className} NodeInput;");
+                        AddToFileContents($"[Input(connectionType = ConnectionType.Override)] public {nasbParserFile.className} NodeInput;");
                     }
                 }
 
