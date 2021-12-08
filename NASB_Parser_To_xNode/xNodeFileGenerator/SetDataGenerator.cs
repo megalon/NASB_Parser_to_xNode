@@ -141,6 +141,9 @@ namespace NASB_Parser_To_xNode
                 OpenBlock();
                 foreach (string key in dict.Keys)
                 {
+                    // Ignore BaseIdentifier, because we don't want to make BaseIdentifier nodes
+                    if (key.Equals("BaseIdentifier")) continue;
+
                     AddToFileContents($"case {variableObj.variableType}.TypeId.{key}:");
                     UpdateIndent(1);
                     {
