@@ -9,11 +9,13 @@ namespace NASB_Parser_To_xNode
     public static class SetDataGenerator
     {
         private static bool isSAOrderedSensitive;
+        private static bool isFSFrame;
         public static void Generate(NASBParserFile nasbParserFile)
         {
             // SAOrderedSensitive is treated differently because we need dynamic ports to
             // show the number of connections
             isSAOrderedSensitive = nasbParserFile.className.Equals("SAOrderedSensitive");
+            isFSFrame = nasbParserFile.className.Equals("FSFrame");
 
             AddToFileContents($"public int SetData({nasbParserFile.className} data, MovesetGraph graph, string assetPath, Vector2 nodeDepthXY)");
             OpenBlock();
@@ -24,6 +26,7 @@ namespace NASB_Parser_To_xNode
                 AddToFileContents("int variableCount = 0;");
                 AddToFileContents($"");
                 int numVariables = 0;
+
                 foreach (VariableObj variableObj in nasbParserFile.variables)
                 {
                     ++numVariables;
@@ -117,6 +120,13 @@ namespace NASB_Parser_To_xNode
                         }
                     }
                 }
+
+                if (isFSFrame)
+                {
+                    AddToFileContents("Value = data.Value;");
+                    AddToFileContents($"");
+                }
+
                 AddToFileContents("return variableCount;");
             }
             CloseBlock();
