@@ -145,11 +145,30 @@ namespace NASB_Parser_To_xNode
 
             OpenBlock();
             {
+                // IdState has no input, so skip it
                 if (!nasbParserFile.className.Equals("IdState"))
                 {
                     if (nasbParserFile.parentClass == null || nasbParserFile.parentClass.Equals("ISerializable"))
                     {
-                        AddToFileContents($"[Input(connectionType = ConnectionType.Override)] public {nasbParserFile.className} NodeInput;");
+                        if (Consts.looseFiles.Contains(nasbParserFile.className))
+                        {
+                            AddToFileContents($"[Input(connectionType = ConnectionType.Override)] public {nasbParserFile.className} NodeInput;");
+                        }
+                    } else if (Consts.classesToNamespaces.ContainsKey(nasbParserFile.parentClass))
+                    {
+                        if (nasbParserFile.className.Contains("_"))
+                        {
+                            AddToFileContents($"[Input(connectionType = ConnectionType.Override)] public {nasbParserFile.className.Replace("_", ".")} NodeInput;");
+                        } else if(Consts.specialInputTypes.Contains(nasbParserFile.className)) {
+                            AddToFileContents($"[Input(connectionType = ConnectionType.Override)] public {Consts.specialInputTypes[Consts.specialInputTypes.IndexOf(nasbParserFile.className)]} NodeInput;");
+                        }
+                        else
+                        {
+                            AddToFileContents($"[Input(connectionType = ConnectionType.Override)] public {nasbParserFile.parentClass} NodeInput;");
+                        }
+                    } else
+                    {
+                        // Nodes that derive from other classes than the "base" classes
                     }
                 }
 
