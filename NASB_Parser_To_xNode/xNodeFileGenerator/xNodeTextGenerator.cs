@@ -148,23 +148,24 @@ namespace NASB_Parser_To_xNode
                 // IdState has no input, so skip it
                 if (!nasbParserFile.className.Equals("IdState"))
                 {
+                    string inputStartText = "[Input(connectionType = ConnectionType.Override)] public ";
                     if (nasbParserFile.parentClass == null || nasbParserFile.parentClass.Equals("ISerializable"))
                     {
                         if (Consts.looseFiles.Contains(nasbParserFile.className))
                         {
-                            AddToFileContents($"[Input(connectionType = ConnectionType.Override)] public {nasbParserFile.className} NodeInput;");
+                            AddToFileContents($"{inputStartText}{nasbParserFile.className} NodeInput;");
                         }
                     } else if (Consts.classesToNamespaces.ContainsKey(nasbParserFile.parentClass))
                     {
                         if (nasbParserFile.className.Contains("_"))
                         {
-                            AddToFileContents($"[Input(connectionType = ConnectionType.Override)] public {nasbParserFile.className.Replace("_", ".")} NodeInput;");
+                            AddToFileContents($"{inputStartText}{nasbParserFile.className.Replace("_", ".")} NodeInput;");
                         } else if(Consts.specialInputTypes.Contains(nasbParserFile.className)) {
-                            AddToFileContents($"[Input(connectionType = ConnectionType.Override)] public {Consts.specialInputTypes[Consts.specialInputTypes.IndexOf(nasbParserFile.className)]} NodeInput;");
+                            AddToFileContents($"{inputStartText}{Consts.specialInputTypes[Consts.specialInputTypes.IndexOf(nasbParserFile.className)]} NodeInput;");
                         }
                         else
                         {
-                            AddToFileContents($"[Input(connectionType = ConnectionType.Override)] public {nasbParserFile.parentClass} NodeInput;");
+                            AddToFileContents($"{inputStartText}{nasbParserFile.parentClass} NodeInput;");
                         }
                     } else
                     {
