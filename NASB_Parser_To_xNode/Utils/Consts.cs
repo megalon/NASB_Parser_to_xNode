@@ -193,6 +193,7 @@ namespace NASB_Parser_To_xNode
             { "SampleAnimId", "SASampleAnim" },
             { "ForceExtraInputId", "SAForceExtraInputCheck" },
             { "LaunchGrabbedCustomId", "SALaunchGrabbedCustom" },
+            { "MapAnimSimpleId", "SAMapAnimationSimple" },
             { "BaseIdentifier", "StateAction" },
         };
 
@@ -202,6 +203,8 @@ namespace NASB_Parser_To_xNode
             { "HoldId", "HoldJump" },
             { "AirdashId", "AirDashJump" },
             { "KnockbackId", "KnockbackJump" },
+            { "DelayedId", "DelayedJump" },
+            { "KnockbackAltId", "KnockbackAltJump" },
             { "BaseIdentifier", "Jump" },
         };
 
