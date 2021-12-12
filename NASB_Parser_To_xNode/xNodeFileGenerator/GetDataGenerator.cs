@@ -9,9 +9,11 @@ namespace NASB_Parser_To_xNode
     public static class GetDataGenerator
     {
         private static bool isSAOrderedSensitive;
+        private static bool isFSFrame;
         public static void Generate(NASBParserFile nasbParserFile)
         {
             isSAOrderedSensitive = nasbParserFile.className.Equals("SAOrderedSensitive");
+            isFSFrame = nasbParserFile.className.Equals("FSFrame");
             bool classWithTID = false;
 
             if (nasbParserFile.parentClass != null && (Consts.classToTypeId.ContainsKey(nasbParserFile.className)))
@@ -37,6 +39,11 @@ namespace NASB_Parser_To_xNode
                 {
                     AddToFileContents($"{mainClassName}.TID = TypeId.{Consts.classToTypeId[nasbParserFile.className]};");
                     AddToFileContents($"{mainClassName}.Version = Version;");
+                }
+
+                if (isFSFrame)
+                {
+                    AddToFileContents($"{mainClassName}.Value = Value;");
                 }
 
                 foreach (VariableObj variableObj in nasbParserFile.variables)

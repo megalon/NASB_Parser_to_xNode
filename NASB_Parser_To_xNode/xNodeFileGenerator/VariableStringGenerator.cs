@@ -10,7 +10,6 @@ namespace NASB_Parser_To_xNode
     {
         public static string GetVariableString(VariableObj variableObj, NASBParserFile nasbParserFile, bool isNested)
         {
-            //var accString = Utils.GetAccessabilityLevelString(variableObj.accessability);
             var accString = "public";
             string relativeNamespace = "";
 
@@ -71,7 +70,14 @@ namespace NASB_Parser_To_xNode
             if  (FindClassIncludingNested(variableClassName))
             {
                 variableObj.isOutput = true;
-                return ($"[Output] public {relativeNamespace}{fullType} {variableObj.name};");
+                string outputAttributeText = "Output";
+                
+                if (variableObj.isList)
+                    outputAttributeText += "(connectionType = ConnectionType.Multiple)";
+                else
+                    outputAttributeText += "(connectionType = ConnectionType.Override)";
+
+                return ($"[{outputAttributeText}] public {relativeNamespace}{fullType} {variableObj.name};");
             }
 
             return ($"{startOfLine}{relativeNamespace}{fullType} {variableObj.name};");

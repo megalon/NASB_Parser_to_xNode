@@ -193,6 +193,7 @@ namespace NASB_Parser_To_xNode
             { "SampleAnimId", "SASampleAnim" },
             { "ForceExtraInputId", "SAForceExtraInputCheck" },
             { "LaunchGrabbedCustomId", "SALaunchGrabbedCustom" },
+            { "MapAnimSimpleId", "SAMapAnimationSimple" },
             { "BaseIdentifier", "StateAction" },
         };
 
@@ -202,6 +203,8 @@ namespace NASB_Parser_To_xNode
             { "HoldId", "HoldJump" },
             { "AirdashId", "AirDashJump" },
             { "KnockbackId", "KnockbackJump" },
+            { "DelayedId", "DelayedJump" },
+            { "KnockbackAltId", "KnockbackAltJump" },
             { "BaseIdentifier", "Jump" },
         };
 
@@ -214,5 +217,18 @@ namespace NASB_Parser_To_xNode
 
         // Class names mapped to their TypeID
         public static Dictionary<string, string> classToTypeId = new Dictionary<string, string>();
+
+        public static List<string> specialInputTypes = new List<string>
+        {
+            { "AnimConfig" },
+            { "InputTrigger" },
+            { "InputValidator" },
+            { "SpawnMovement" },
+            { "SAGUAMessageObject" },
+            { "MovementConfig" },
+            { "HurtBone"},
+            { "HurtSetSetup" },
+            { "LookForInput" },
+        };
     }
 }
