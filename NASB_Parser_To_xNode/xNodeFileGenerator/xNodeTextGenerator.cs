@@ -198,6 +198,8 @@ namespace NASB_Parser_To_xNode
                         AddToFileContents("base.Init();");
                         if (Consts.classToTypeId.ContainsKey(nasbParserFile.className))
                             AddToFileContents($"TID = TypeId.{Consts.classToTypeId[nasbParserFile.className]};");
+                        if (Consts.specialClassVersions.ContainsKey(nasbParserFile.className))
+                            AddToFileContents($"Version = {Consts.specialClassVersions[nasbParserFile.className]};");
 
                         if (nasbParserFile.className.Equals("InputValidator"))
                         {

@@ -60,6 +60,20 @@ namespace NASB_Parser_To_xNode
 
         public static List<string> classesToIgnore = new List<string> { "BitUtil" };
 
+        // Everything that is BulkSerializable has a "Version" number in the game.
+        // Most of them are zero, but the game reads the data differently with different version numbers.
+        // When creating a node, I we always want the latest version of that node,
+        // so we need to keep track of what the latest version is.
+        // You can find this version by checking the ReadSerial functions in the Assembly-CSharp.dll
+        public static Dictionary<string, int> specialClassVersions = new Dictionary<string, int> {
+            { "AirDashJump", 1 },
+            { "HurtBone", 1 },
+            { "SACameraShake", 1 },
+            { "SAConfigHitbox", 1 },
+            { "SASpawnAgent", 1 },
+            { "SASpawnAgent2", 2 },
+        };
+
         public static Dictionary<string, string> classesToNamespaces = new Dictionary<string, string> {
             {"FloatSource", "FloatSources"},
             {"Jump", "Jumps"},
