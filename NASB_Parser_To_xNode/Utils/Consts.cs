@@ -208,6 +208,9 @@ namespace NASB_Parser_To_xNode
             { "ForceExtraInputId", "SAForceExtraInputCheck" },
             { "LaunchGrabbedCustomId", "SALaunchGrabbedCustom" },
             { "MapAnimSimpleId", "SAMapAnimationSimple" },
+            { "OnLeaveParentId", "SAOnLeaveParent" },
+            { "PersistLocalFXId", "SAPersistLocalFX" },
+            { "OnLeaveParentId", "SAOnLeaveParent" },
             { "BaseIdentifier", "StateAction" },
         };
 
@@ -218,7 +221,7 @@ namespace NASB_Parser_To_xNode
             { "AirdashId", "AirDashJump" },
             { "KnockbackId", "KnockbackJump" },
             { "DelayedId", "DelayedJump" },
-            { "KnockbackAltId", "KnockbackAltJump" },
+            { "ClampMomentumId", "ClampMomentumJump" },
             { "BaseIdentifier", "Jump" },
         };
 
