@@ -217,7 +217,6 @@ namespace NASB_Parser_To_xNode
             { "MapAnimSimpleId", "SAMapAnimationSimple" },
             { "OnLeaveParentId", "SAOnLeaveParent" },
             { "PersistLocalFXId", "SAPersistLocalFX" },
-            { "OnLeaveParentId", "SAOnLeaveParent" },
             { "BaseIdentifier", "StateAction" },
         };
 
