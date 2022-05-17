@@ -15,7 +15,8 @@ namespace NASB_Parser_To_xNode
 
             // Special case for TID and Version 
             if ((variableObj.name.Equals("TID") && variableObj.variableType.Equals("TypeId"))
-                || (variableObj.name.Equals("Version") && variableObj.variableType.Equals("int")))
+                || (variableObj.name.Equals("Version") && variableObj.variableType.Equals("int"))
+                || (variableObj.name.Equals("VersionHBM") && variableObj.variableType.Equals("int")))
             {
                 accString = "[HideInInspector] public";
 
