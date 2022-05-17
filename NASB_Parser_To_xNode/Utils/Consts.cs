@@ -78,7 +78,8 @@ namespace NASB_Parser_To_xNode
             { "KnockbackJump", 3 },
             { "SAManipHitbox", 1 },
             { "SAManipHurtbox", 1 },
-            { "SAStopJump", 1 }
+            { "SAStopJump", 1 },
+            { "SAFindFloor", 1 }
         };
 
         public static Dictionary<string, string> classesToNamespaces = new Dictionary<string, string> {
