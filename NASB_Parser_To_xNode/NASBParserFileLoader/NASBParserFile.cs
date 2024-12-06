@@ -12,6 +12,7 @@ namespace NASB_Parser_To_xNode
         public AccessabilityLevel classType;
         public bool isAbstract;
         public bool isStatic;
+        public bool isPartial;
         public string className;
         public string parentClass;
         public List<VariableObj> variables;

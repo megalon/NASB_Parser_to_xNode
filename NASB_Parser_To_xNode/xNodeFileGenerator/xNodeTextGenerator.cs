@@ -120,7 +120,8 @@ namespace NASB_Parser_To_xNode
                 nasbParserFile.className = nasbParserFile.className.Substring(nasbParserFile.className.LastIndexOf("\\") + 1);
             } else if (
                 nasbParserFile.relativePath.Contains("\\") 
-                && nasbParserFile.parentClass.Equals("ISerializable")
+                && nasbParserFile.parentClass != null
+                && nasbParserFile.parentClass.Equals("IBulkSerializer")
                 && !Consts.classesToNamespaces.ContainsKey(nasbParserFile.className))
             {
                 // Set parent class for loose files in folders

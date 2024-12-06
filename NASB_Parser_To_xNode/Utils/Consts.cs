@@ -47,18 +47,20 @@ namespace NASB_Parser_To_xNode
         public static List<string> basicTypes = new List<string> { "bool", "int", "string", "float", "double", "MovesetParser.Unity.Vector3" };
 
         public static NASBParserFolder[] folders = {
+            new NASBParserFolder("CheckThings", "CheckThing"),
             new NASBParserFolder("FloatSources", "FloatSource"),
             new NASBParserFolder("Jumps", "Jump"),
-            new NASBParserFolder("CheckThings", "CheckThing"),
+            new NASBParserFolder("Misc", "Misc"),
             new NASBParserFolder("StateActions", "StateAction"),
-            new NASBParserFolder("ObjectSources", "ObjectSource")
+            new NASBParserFolder("ObjectSources", "ObjectSource"),
+            new NASBParserFolder("Unity", "Unity")
         };
 
-        public static List<string> looseFiles = new List<string>{ "AgentState", "IdState", "TimedAction", "SerialMoveset", "TimedAction" };
+        public static List<string> looseFiles = new List<string>{ "AgentState", "IdState", "TimedAction", "Moveset" };
 
         public static List<string> enumOnlyFiles = new List<string> { "GIEV", "HurtType", "Ease" };
 
-        public static List<string> classesToIgnore = new List<string> { "BitUtil" };
+        public static List<string> classesToIgnore = new List<string> { "ByteUtility" };
 
         // Everything that is BulkSerializable has a "Version" number in the game.
         // Most of them are zero, but the game reads the data differently with different version numbers.
@@ -85,9 +87,11 @@ namespace NASB_Parser_To_xNode
         public static Dictionary<string, string> classesToNamespaces = new Dictionary<string, string> {
             {"FloatSource", "FloatSources"},
             {"Jump", "Jumps"},
+            {"Misc", "Misc" },
             {"CheckThing", "CheckThings"},
             {"StateAction", "StateActions"},
-            {"ObjectSource", "ObjectSources"}
+            {"ObjectSource", "ObjectSources"},
+            {"Unity", "Unity" }
         };
 
         public static Dictionary<string, string> checkThingsIds = new Dictionary<string, string>

@@ -38,7 +38,7 @@ namespace NASB_Parser_To_xNode
 
                     string line;
                     string className = Path.GetFileNameWithoutExtension(filePath);
-                    nasbParserFile.relativePath = filePath.Substring(mainPath.Length);
+                    nasbParserFile.relativePath = filePath.Substring(mainPath.Length + 1);
                     nasbParserFile.className = Path.GetFileNameWithoutExtension(nasbParserFile.relativePath);
 
                     mainFileReadingState = ReadingState.ReadingImportsAndNamespace;
@@ -110,8 +110,13 @@ namespace NASB_Parser_To_xNode
         {
             if (!line.Contains(" class ")) return;
 
-            if (line.Contains(":"))
+            if (line.Contains(":") && !line.Contains(": IBulkSerializer"))
             {
+                if (line.Contains(", IBulkSerializer"))
+                {
+                    line = line.Substring(0, line.IndexOf(", IBulkSerializer"));
+                }
+
                 nasbParserFile.parentClass = line.Substring(line.IndexOf(" : ") + " : ".Length);
             }
 
@@ -127,6 +132,12 @@ namespace NASB_Parser_To_xNode
             if (line.Contains(" static "))
             {
                 nasbParserFile.isStatic = true;
+                nameIndex++;
+            }
+
+            if (line.Contains(" partial "))
+            {
+                nasbParserFile.isPartial = true;
                 nameIndex++;
             }
 
