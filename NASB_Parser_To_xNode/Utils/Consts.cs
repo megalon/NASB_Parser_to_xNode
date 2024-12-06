@@ -44,7 +44,7 @@ namespace NASB_Parser_To_xNode
             }
         }
 
-        public static List<string> basicTypes = new List<string> { "bool", "int", "string", "float", "double", "NASB_Parser.Vector3" };
+        public static List<string> basicTypes = new List<string> { "bool", "int", "string", "float", "double", "MovesetParser.Unity.Vector3" };
 
         public static NASBParserFolder[] folders = {
             new NASBParserFolder("FloatSources", "FloatSource"),

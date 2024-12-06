@@ -12,10 +12,10 @@ namespace NASB_Parser_To_xNode
         private static string indent;
         private static string fileContents;
 
-        private static string[] otherImports = { "UnityEngine", "UnityEditor", "XNode", "XNodeEditor", "NASB_Parser" };
+        private static string[] otherImports = { "UnityEngine", "UnityEditor", "XNode", "XNodeEditor", "MovesetParser" };
         private static Dictionary<string, string> specialImports = new Dictionary<string, string> {
-            { "SAManipHitbox", "static NASB_Parser.StateActions.SAManipHitbox" },
-            { "SAManipHurtbox", "static NASB_Parser.StateActions.SAManipHurtbox" },
+            { "SAManipHitbox", "static MovesetParser.StateActions.SAManipHitbox" },
+            { "SAManipHurtbox", "static MovesetParser.StateActions.SAManipHurtbox" },
             { "SAOrderedSensitive", "System.Linq" }
         };
         private static Dictionary<string, string> specialTypes = new Dictionary<string, string>
@@ -52,7 +52,7 @@ namespace NASB_Parser_To_xNode
 
             foreach (NASBParserFolder folder in Consts.folders)
             {
-                var extraParserImport = "NASB_Parser." + folder.folderName;
+                var extraParserImport = "MovesetParser." + folder.folderName;
                 if (!nasbParserFile.imports.Contains(extraParserImport))
                     AddToFileContents("using " + extraParserImport + ";");
             }
@@ -79,9 +79,9 @@ namespace NASB_Parser_To_xNode
 
             string namespaceSubfolder = "";
 
-            if (nasbParserFile.@namespace != null && nasbParserFile.@namespace.Contains("NASB_Parser."))
+            if (nasbParserFile.@namespace != null && nasbParserFile.@namespace.Contains("MovesetParser."))
             {
-                namespaceSubfolder = nasbParserFile.@namespace.Substring("NASB_Parser.".Length);
+                namespaceSubfolder = nasbParserFile.@namespace.Substring("MovesetParser.".Length);
             }
 
             AddToFileContents("namespace NASB_Moveset_Editor" + (namespaceSubfolder.Equals(string.Empty) ? "" : "." + namespaceSubfolder));
