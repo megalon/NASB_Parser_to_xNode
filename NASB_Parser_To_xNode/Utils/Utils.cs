@@ -79,5 +79,20 @@ namespace NASB_Parser_To_xNode
             }
             throw new Exception("Invalid AccessabilityLevel!");
         }
+
+        public static bool HasTypeID(string typeName)
+        {
+            if (Consts.checkThingTypeIds.Contains(typeName))
+                return true;
+            if (Consts.floatSourceTypeIds.Contains(typeName))
+                return true;
+            if (Consts.jumpTypeIds.Contains(typeName))
+                return true;
+            if (Consts.objectSourceTypeIds.Contains(typeName))
+                return true;
+            if (Consts.stateActionTypeIds.Contains(typeName))
+                return true;
+            return false;
+        }
     }
 }

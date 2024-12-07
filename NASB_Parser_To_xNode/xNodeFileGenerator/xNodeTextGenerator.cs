@@ -197,7 +197,9 @@ namespace NASB_Parser_To_xNode
                     OpenBlock();
                     {
                         AddToFileContents("base.Init();");
-                        AddToFileContents($"TID = TypeId.{nasbParserFile.className};");
+
+                        if (Utils.HasTypeID(nasbParserFile.className))
+                            AddToFileContents($"TID = TypeId.{nasbParserFile.className};");
 
                         if (nasbParserFile.className.Equals("InputValidator"))
                         {

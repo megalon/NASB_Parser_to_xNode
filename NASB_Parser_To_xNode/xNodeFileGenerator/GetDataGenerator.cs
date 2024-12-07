@@ -15,29 +15,19 @@ namespace NASB_Parser_To_xNode
             isSAOrderedSensitive = nasbParserFile.className.Equals("SAOrderedSensitive");
             isFSFrame = nasbParserFile.className.Equals("FSFrame");
 
-            // TODO: FIX THIS now that we don't use the classToTypeId 
+            bool classWithTID = Utils.HasTypeID(nasbParserFile.className);
 
-
-            //bool classWithTID = false;
-
-            //if (nasbParserFile.parentClass != null && (Consts.classToTypeId.ContainsKey(nasbParserFile.className)))
-            //{
-            //    classWithTID = true;
-            //}
-
-            //if (classWithTID && nasbParserFile.parentClass.Equals("IBulkSerializer"))
-            //{
-            //    AddToFileContents($"public {nasbParserFile.className} GetData()");
-            //}
-            //else
-            //{
-            //    AddToFileContents($"public {(classWithTID ? "new " : "")}{nasbParserFile.className} GetData()");
-            //}
-
-            bool classWithTID = true;
-
-            AddToFileContents($"public {nasbParserFile.className} GetData()");
-            //
+            if (classWithTID
+                && nasbParserFile.parentClass != null
+                && nasbParserFile.parentClass.Equals("IBulkSerializer")
+            )
+            {
+                AddToFileContents($"public {nasbParserFile.className} GetData()");
+            }
+            else
+            {
+                AddToFileContents($"public {(classWithTID ? "new " : "")}{nasbParserFile.className} GetData()");
+            }
 
 
             OpenBlock();
