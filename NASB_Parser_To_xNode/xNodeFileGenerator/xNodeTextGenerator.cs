@@ -119,7 +119,7 @@ namespace NASB_Parser_To_xNode
                 nasbParserFile.className = nasbParserFile.relativePath.Replace(".", "_");
                 nasbParserFile.className = nasbParserFile.className.Substring(nasbParserFile.className.LastIndexOf("\\") + 1);
             } else if (
-                nasbParserFile.relativePath.Contains("\\") 
+                nasbParserFile.relativePath.Contains("\\")
                 && nasbParserFile.parentClass != null
                 && nasbParserFile.parentClass.Equals("IBulkSerializer")
                 && !Consts.classesToNamespaces.ContainsKey(nasbParserFile.className))
@@ -134,7 +134,10 @@ namespace NASB_Parser_To_xNode
             {
                 // IdState doesn't need the "[Input]" that BaseMovesetNode has, so just inherit from default Node
                 classDeclaration += $"Node : Node";
-            } else if (nasbParserFile.parentClass == null || nasbParserFile.parentClass.Equals("IBulkSerializer"))
+            } else if (nasbParserFile.parentClass == null
+                || nasbParserFile.parentClass.Equals("IBulkSerializer")
+                || nasbParserFile.parentClass.Equals("Misc")
+                )
             {
                 classDeclaration += $"Node : BaseMovesetNode";
             } else
