@@ -13,10 +13,8 @@ namespace NASB_Parser_To_xNode
             var accString = "public";
             string relativeNamespace = "";
 
-            // Special case for TID and Version 
-            if ((variableObj.name.Equals("TID") && variableObj.variableType.Equals("TypeId"))
-                || (variableObj.name.Equals("Version") && variableObj.variableType.Equals("int"))
-                || (variableObj.name.Equals("VersionHBM") && variableObj.variableType.Equals("int")))
+            // Special case for TID
+            if (variableObj.name.Equals("TID") && variableObj.variableType.Equals("TypeId"))
             {
                 accString = "[HideInInspector] public";
 

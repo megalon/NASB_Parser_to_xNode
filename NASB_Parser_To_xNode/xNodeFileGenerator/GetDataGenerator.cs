@@ -48,7 +48,6 @@ namespace NASB_Parser_To_xNode
                 if (classWithTID)
                 {
                     AddToFileContents($"{mainClassName}.TID = TypeId.{nasbParserFile.className};");
-                    AddToFileContents($"{mainClassName}.Version = Version;");
                 }
 
                 if (isFSFrame)
