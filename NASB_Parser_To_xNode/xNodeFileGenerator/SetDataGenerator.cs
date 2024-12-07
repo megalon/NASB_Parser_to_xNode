@@ -17,7 +17,7 @@ namespace NASB_Parser_To_xNode
             isSAOrderedSensitive = nasbParserFile.className.Equals("SAOrderedSensitive");
             isFSFrame = nasbParserFile.className.Equals("FSFrame");
 
-            AddToFileContents($"public int SetData({nasbParserFile.className} data, MovesetGraph graph, string assetPath, Vector2 nodeDepthXY)");
+            AddToFileContents($"public int SetData({nasbParserFile.className} data, MovesetGraph graph, string assetPath, UnityEngine.Vector2 nodeDepthXY)");
             OpenBlock();
             {
                 AddToFileContents($"name = NodeEditorUtilities.NodeDefaultName(typeof({nasbParserFile.className}));");
