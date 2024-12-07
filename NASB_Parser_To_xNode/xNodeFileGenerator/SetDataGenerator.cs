@@ -34,7 +34,7 @@ namespace NASB_Parser_To_xNode
 
                     // Get the main type for this class if it is nested
                     var mainType = "";
-                    if (variableObj.variableType.LastIndexOf(".") > 0 && !variableObj.variableType.Equals("NASB_Parser.Vector3"))
+                    if (variableObj.variableType.LastIndexOf(".") > 0 && !variableObj.variableType.Equals("MovesetParser.Unity.Vector3"))
                     {
                         mainType = variableObj.variableType.Substring(variableObj.variableType.LastIndexOf(".") + 1);
                     }
@@ -85,13 +85,13 @@ namespace NASB_Parser_To_xNode
                         {
                             AddToFileContents($"");
 
-                            Dictionary<string, string> dict = null;
-                            if (variableObj.variableType.Equals("StateAction")) dict = Consts.stateActionIds;
-                            else if (variableObj.variableType.Equals("CheckThing")) dict = Consts.checkThingsIds;
-                            else if (variableObj.variableType.Equals("Jump")) dict = Consts.jumpId;
-                            else if (variableObj.variableType.Equals("FloatSource")) dict = Consts.floatSourceIds;
-                            else if (variableObj.variableType.Equals("ObjectSource")) dict = Consts.objectSourceIds;
-
+                            string[] idsArray = null;
+                            if (variableObj.variableType.Equals("StateAction")) idsArray = Consts.stateActionTypeIds;
+                            else if (variableObj.variableType.Equals("CheckThing")) idsArray = Consts.checkThingTypeIds;
+                            else if (variableObj.variableType.Equals("Jump")) idsArray = Consts.jumpTypeIds;
+                            else if (variableObj.variableType.Equals("FloatSource")) idsArray = Consts.floatSourceTypeIds;
+                            else if (variableObj.variableType.Equals("ObjectSource")) idsArray = Consts.objectSourceTypeIds;
+                            
                             if (variableObj.isList)
                             {
                                 // Create the list of nodes for this variable type and add them to the graph
@@ -106,14 +106,14 @@ namespace NASB_Parser_To_xNode
                                         AddToFileContents("");
                                     }
 
-                                    GenerateSwitchStatement(nodeName, variableObj, dict, "_item");
+                                    GenerateSwitchStatement(nodeName, variableObj, idsArray, "_item");
                                     AddToFileContents("++variableCount;");
                                 }
                                 CloseBlock();
                             }
                             else
                             {
-                                GenerateSwitchStatement(nodeName, variableObj, dict, "");
+                                GenerateSwitchStatement(nodeName, variableObj, idsArray, "");
                                 if (numVariables < nasbParserFile.variables.Count) AddToFileContents("++variableCount;");
                             }
                             AddToFileContents($"");
@@ -132,22 +132,22 @@ namespace NASB_Parser_To_xNode
             CloseBlock();
         }
 
-        private static void GenerateSwitchStatement(string nodeName, VariableObj variableObj, Dictionary<string, string> dict, string itemText)
+        private static void GenerateSwitchStatement(string nodeName, VariableObj variableObj, string[] idsArray, string itemText)
         {
             // Create the node for this variable type and add it to the graph
-            if (dict != null)
+            if (idsArray != null)
             {
                 AddToFileContents($"switch ({variableObj.name}{itemText}.TID)");
                 OpenBlock();
-                foreach (string key in dict.Keys)
+                foreach (string id in idsArray)
                 {
                     // Ignore BaseIdentifier, because we don't want to make BaseIdentifier nodes
-                    if (key.Equals("BaseIdentifier")) continue;
+                    if (id.Equals("BaseIdentifier")) continue;
 
-                    AddToFileContents($"case {variableObj.variableType}.TypeId.{key}:");
+                    AddToFileContents($"case {variableObj.variableType}.TypeId.{id}:");
                     UpdateIndent(1);
                     {
-                        AddNodeToGraph(nodeName, variableObj, key, dict[key], itemText);
+                        AddNodeToGraph(nodeName, variableObj, id, id, itemText);
                     }
                     UpdateIndent(-1);
                     AddToFileContents($"break;");

@@ -110,7 +110,7 @@ namespace NASB_Parser_To_xNode
         {
             if (!line.Contains(" class ")) return;
 
-            if (line.Contains(":") && !line.Contains(": IBulkSerializer"))
+            if (line.Contains(":"))
             {
                 if (line.Contains(", IBulkSerializer"))
                 {

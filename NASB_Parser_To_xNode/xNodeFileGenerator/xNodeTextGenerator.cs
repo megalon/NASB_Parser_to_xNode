@@ -66,7 +66,7 @@ namespace NASB_Parser_To_xNode
                 && !nasbParserFile.parentClass.Equals(string.Empty)
                 && !Path.GetDirectoryName(nasbParserFile.relativePath).Equals(string.Empty))
             {
-                if (nasbParserFile.parentClass.Equals("ISerializable"))
+                if (nasbParserFile.parentClass.Equals("IBulkSerializer"))
                 {
                     if (!isNested) AddToFileContents($"using static {Utils.GetRelativeNamespace(nasbParserFile)};");
                 } else 
@@ -134,7 +134,7 @@ namespace NASB_Parser_To_xNode
             {
                 // IdState doesn't need the "[Input]" that BaseMovesetNode has, so just inherit from default Node
                 classDeclaration += $"Node : Node";
-            } else if (nasbParserFile.parentClass == null || nasbParserFile.parentClass.Equals("ISerializable"))
+            } else if (nasbParserFile.parentClass == null || nasbParserFile.parentClass.Equals("IBulkSerializer"))
             {
                 classDeclaration += $"Node : BaseMovesetNode";
             } else
@@ -150,7 +150,7 @@ namespace NASB_Parser_To_xNode
                 if (!nasbParserFile.className.Equals("IdState"))
                 {
                     string inputStartText = "[Input(connectionType = ConnectionType.Override)] public ";
-                    if (nasbParserFile.parentClass == null || nasbParserFile.parentClass.Equals("ISerializable"))
+                    if (nasbParserFile.parentClass == null || nasbParserFile.parentClass.Equals("IBulkSerializer"))
                     {
                         if (Consts.looseFiles.Contains(nasbParserFile.className))
                         {
@@ -197,8 +197,8 @@ namespace NASB_Parser_To_xNode
                     OpenBlock();
                     {
                         AddToFileContents("base.Init();");
-                        if (Consts.classToTypeId.ContainsKey(nasbParserFile.className))
-                            AddToFileContents($"TID = TypeId.{Consts.classToTypeId[nasbParserFile.className]};");
+                        AddToFileContents($"TID = TypeId.{nasbParserFile.className};");
+
                         if (Consts.specialClassVersions.ContainsKey(nasbParserFile.className))
                             AddToFileContents($"Version = {Consts.specialClassVersions[nasbParserFile.className]};");
 

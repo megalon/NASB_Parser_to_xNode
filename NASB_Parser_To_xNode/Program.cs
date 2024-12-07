@@ -10,8 +10,6 @@ namespace NASB_Parser_To_xNode
 
         static void Main(string[] args)
         {
-            Consts.GenerateClassToTypeIdDict();
-
             string mainPath = "C:/Users/megalon/main/megalon-github/NASB-Moveset-Parser/Parser";
             string outputPath = "C:/Users/megalon/main/UnityProjects/NASB Moveset Editor/Assets/Editor/NASB Moveset Editor/Scripts/Nodes";
 

@@ -27,7 +27,7 @@ namespace NASB_Parser_To_xNode
             var startOfLine = $"{accString} {(variableObj.isStatic ? "static " : "")}{(variableObj.isReadonly ? "readonly " : "")}";
 
             // Handle Vector3 ambiguity
-            if (variableObj.variableType.Equals("Vector3")) variableObj.variableType = "NASB_Parser.Vector3";
+            if (variableObj.variableType.Equals("Vector3")) variableObj.variableType = "MovesetParser.Unity.Vector3";
 
             // Handle HBM ambiguity
             if (nasbParserFile.className.EndsWith("_HBM"))

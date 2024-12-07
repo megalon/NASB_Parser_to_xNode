@@ -14,21 +14,31 @@ namespace NASB_Parser_To_xNode
         {
             isSAOrderedSensitive = nasbParserFile.className.Equals("SAOrderedSensitive");
             isFSFrame = nasbParserFile.className.Equals("FSFrame");
-            bool classWithTID = false;
 
-            if (nasbParserFile.parentClass != null && (Consts.classToTypeId.ContainsKey(nasbParserFile.className)))
-            {
-                classWithTID = true;
-            }
+            // TODO: FIX THIS now that we don't use the classToTypeId 
 
-            if (classWithTID && nasbParserFile.parentClass.Equals("ISerializable"))
-            {
-                AddToFileContents($"public {nasbParserFile.className} GetData()");
-            }
-            else
-            {
-                AddToFileContents($"public {(classWithTID ? "new " : "")}{nasbParserFile.className} GetData()");
-            }
+
+            //bool classWithTID = false;
+
+            //if (nasbParserFile.parentClass != null && (Consts.classToTypeId.ContainsKey(nasbParserFile.className)))
+            //{
+            //    classWithTID = true;
+            //}
+
+            //if (classWithTID && nasbParserFile.parentClass.Equals("IBulkSerializer"))
+            //{
+            //    AddToFileContents($"public {nasbParserFile.className} GetData()");
+            //}
+            //else
+            //{
+            //    AddToFileContents($"public {(classWithTID ? "new " : "")}{nasbParserFile.className} GetData()");
+            //}
+
+            bool classWithTID = true;
+
+            AddToFileContents($"public {nasbParserFile.className} GetData()");
+            //
+
 
             OpenBlock();
             {
@@ -37,7 +47,7 @@ namespace NASB_Parser_To_xNode
 
                 if (classWithTID)
                 {
-                    AddToFileContents($"{mainClassName}.TID = TypeId.{Consts.classToTypeId[nasbParserFile.className]};");
+                    AddToFileContents($"{mainClassName}.TID = TypeId.{nasbParserFile.className};");
                     AddToFileContents($"{mainClassName}.Version = Version;");
                 }
 
@@ -62,12 +72,12 @@ namespace NASB_Parser_To_xNode
                         continue;
                     }
 
-                    Dictionary<string, string> dict = null;
-                    if (variableObj.variableType.Equals("StateAction")) dict = Consts.stateActionIds;
-                    else if (variableObj.variableType.Equals("CheckThing")) dict = Consts.checkThingsIds;
-                    else if (variableObj.variableType.Equals("Jump")) dict = Consts.jumpId;
-                    else if (variableObj.variableType.Equals("FloatSource")) dict = Consts.floatSourceIds;
-                    else if (variableObj.variableType.Equals("ObjectSource")) dict = Consts.objectSourceIds;
+                    string[] idsArray = null;
+                    if (variableObj.variableType.Equals("StateAction")) idsArray = Consts.stateActionTypeIds;
+                    else if (variableObj.variableType.Equals("CheckThing")) idsArray = Consts.checkThingTypeIds;
+                    else if (variableObj.variableType.Equals("Jump")) idsArray = Consts.jumpTypeIds;
+                    else if (variableObj.variableType.Equals("FloatSource")) idsArray = Consts.floatSourceTypeIds;
+                    else if (variableObj.variableType.Equals("ObjectSource")) idsArray = Consts.objectSourceTypeIds;
 
                     if (variableObj.isList)
                     {
@@ -83,7 +93,7 @@ namespace NASB_Parser_To_xNode
                             OpenBlock();
                                 AddToFileContents($"{typeClassFileName}Node {nodeName} = ({typeClassFileName}Node)port.node;");
                         }
-                        GenerateSwitchStatement(nodeName, variableObj, dict, mainClassName, typeClassFileName, true);
+                        GenerateSwitchStatement(nodeName, variableObj, idsArray, mainClassName, typeClassFileName, true);
                         CloseBlock();
                     } else
                     {
@@ -91,7 +101,7 @@ namespace NASB_Parser_To_xNode
                         OpenBlock();
                         {
                             AddToFileContents($"{typeClassFileName}Node {nodeName} = ({typeClassFileName}Node)GetPort(\"{variableObj.name}\").GetConnection(0).node;");
-                            GenerateSwitchStatement(nodeName, variableObj, dict, mainClassName, typeClassFileName, false);
+                            GenerateSwitchStatement(nodeName, variableObj, idsArray, mainClassName, typeClassFileName, false);
                         }
                         CloseBlock();
                     }
@@ -101,31 +111,31 @@ namespace NASB_Parser_To_xNode
             CloseBlock();
         }
 
-        private static void GenerateSwitchStatement(string nodeName, VariableObj variableObj, Dictionary<string, string> dict, string mainClassName, string typeClassFileName, bool isList)
+        private static void GenerateSwitchStatement(string nodeName, VariableObj variableObj, string[] idsArray, string mainClassName, string typeClassFileName, bool isList)
         {
-            if (dict != null)
+            if (idsArray != null)
             {
                 AddToFileContents($"switch ({nodeName}.TID)");
                 OpenBlock();
-                foreach (string key in dict.Keys)
+                foreach (string id in idsArray)
                 {
-                    AddToFileContents($"case {variableObj.variableType}.TypeId.{key}:");
+                    AddToFileContents($"case {variableObj.variableType}.TypeId.{id}:");
                     UpdateIndent(1);
                     {
                         if (isList)
                         {
                             if (isSAOrderedSensitive)
                             {
-                                AddToFileContents($"{dict[key]}Node {key}_{nodeName} = ({dict[key]}Node)port.Connection.node;");
+                                AddToFileContents($"{id}Node {id}_{nodeName} = ({id}Node)port.Connection.node;");
                             } else
                             {
-                                AddToFileContents($"{dict[key]}Node {key}_{nodeName} = ({dict[key]}Node)port.node;");
+                                AddToFileContents($"{id}Node {id}_{nodeName} = ({id}Node)port.node;");
                             }
-                            AddToFileContents($"{mainClassName}.{variableObj.name}.Add({key}_{nodeName}.GetData());");
+                            AddToFileContents($"{mainClassName}.{variableObj.name}.Add({id}_{nodeName}.GetData());");
                         } else
                         {
-                            AddToFileContents($"{dict[key]}Node {key}_{nodeName} = ({dict[key]}Node)GetPort(\"{variableObj.name}\").GetConnection(0).node;");
-                            AddToFileContents($"{mainClassName}.{variableObj.name} = {key}_{nodeName}.GetData();");
+                            AddToFileContents($"{id}Node {id}_{nodeName} = ({id}Node)GetPort(\"{variableObj.name}\").GetConnection(0).node;");
+                            AddToFileContents($"{mainClassName}.{variableObj.name} = {id}_{nodeName}.GetData();");
                         }
                     }
                     UpdateIndent(-1);
