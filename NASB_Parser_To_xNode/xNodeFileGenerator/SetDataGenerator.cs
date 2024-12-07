@@ -178,7 +178,7 @@ namespace NASB_Parser_To_xNode
                 }
 
                 AddToFileContents($"AssetDatabase.AddObjectToAsset({nodeName}, assetPath);");
-                AddToFileContents($"variableCount += {nodeName}.SetData(({value}){variableObj.name}{itemText}, graph, assetPath, nodeDepthXY + new Vector2(1, variableCount));");
+                AddToFileContents($"variableCount += {nodeName}.SetData(({value}){variableObj.name}{itemText}, graph, assetPath, nodeDepthXY + new UnityEngine.Vector2(1, variableCount));");
             }
             else
             {
@@ -190,7 +190,7 @@ namespace NASB_Parser_To_xNode
                 AddToFileContents($"{typeName}Node {nodeName} = graph.AddNode<{typeName}Node>();");
                 AddToFileContents($"GetPort(\"{variableObj.name}\").Connect({nodeName}.GetPort(\"NodeInput\"));");
                 AddToFileContents($"AssetDatabase.AddObjectToAsset({nodeName}, assetPath);");
-                AddToFileContents($"variableCount += {nodeName}.SetData({variableObj.name}{itemText}, graph, assetPath, nodeDepthXY + new Vector2(1, variableCount));");
+                AddToFileContents($"variableCount += {nodeName}.SetData({variableObj.name}{itemText}, graph, assetPath, nodeDepthXY + new UnityEngine.Vector2(1, variableCount));");
             }
         }
     }
