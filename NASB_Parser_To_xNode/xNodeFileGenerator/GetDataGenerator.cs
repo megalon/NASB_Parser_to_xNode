@@ -8,11 +8,11 @@ namespace NASB_Parser_To_xNode
 {
     public static class GetDataGenerator
     {
-        private static bool isSAOrderedSensitive;
+        private static bool isSAOrderSensitive;
         private static bool isFSFrame;
         public static void Generate(NASBParserFile nasbParserFile)
         {
-            isSAOrderedSensitive = nasbParserFile.className.Equals("SAOrderedSensitive");
+            isSAOrderSensitive = nasbParserFile.className.Equals("SAOrderSensitive");
             isFSFrame = nasbParserFile.className.Equals("FSFrame");
 
             bool classWithTID = Utils.HasTypeID(nasbParserFile.className);
@@ -78,7 +78,7 @@ namespace NASB_Parser_To_xNode
                             firstArrayVariable = false;
                         }
 
-                        if (isSAOrderedSensitive)
+                        if (isSAOrderSensitive)
                         {
                             AddToFileContents($"foreach(NodePort port in DynamicOutputs)");
                             OpenBlock();
@@ -128,7 +128,7 @@ namespace NASB_Parser_To_xNode
                     {
                         if (variableObj.isList || variableObj.isArray)
                         {
-                            if (isSAOrderedSensitive)
+                            if (isSAOrderSensitive)
                             {
                                 AddToFileContents($"{id}Node {id}_{nodeName} = ({id}Node)port.Connection.node;");
                             }

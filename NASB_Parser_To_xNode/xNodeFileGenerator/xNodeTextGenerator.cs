@@ -17,7 +17,7 @@ namespace NASB_Parser_To_xNode
         private static Dictionary<string, string> specialImports = new Dictionary<string, string> {
             { "SAManipHitbox", "static MovesetParser.StateActions.SAManipHitbox" },
             { "SAManipHurtbox", "static MovesetParser.StateActions.SAManipHurtbox" },
-            { "SAOrderedSensitive", "System.Linq" }
+            { "SAOrderSensitive", "System.Linq" }
         };
         private static Dictionary<string, string> specialTypes = new Dictionary<string, string>
         {
@@ -98,7 +98,7 @@ namespace NASB_Parser_To_xNode
 
         private static void HandleClass(NASBParserFile nasbParserFile, bool isNested)
         {
-            bool isSAOrderedSensitive = nasbParserFile.className.Equals("SAOrderedSensitive");
+            bool isSAOrderSensitive = nasbParserFile.className.Equals("SAOrderSensitive");
 
             // Fix variables with type namespace of nested class
             foreach (VariableObj variable in nasbParserFile.variables)
@@ -186,8 +186,8 @@ namespace NASB_Parser_To_xNode
                 // Variables
                 foreach (VariableObj variableObj in nasbParserFile.variables)
                 {
-                    // Skip the "Actions" variable for SAOrderedSensitive
-                    if (isSAOrderedSensitive && variableObj.name.Equals("Actions"))
+                    // Skip the "Actions" variable for SAOrderSensitive
+                    if (isSAOrderSensitive && variableObj.name.Equals("Actions"))
                     {
                         // Add the listSize variable, and set it to an output
                         variableObj.isOutput = true;

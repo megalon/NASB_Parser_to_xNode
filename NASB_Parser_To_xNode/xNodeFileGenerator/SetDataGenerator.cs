@@ -8,13 +8,13 @@ namespace NASB_Parser_To_xNode
 {
     public static class SetDataGenerator
     {
-        private static bool isSAOrderedSensitive;
+        private static bool isSAOrderSensitive;
         private static bool isFSFrame;
         public static void Generate(NASBParserFile nasbParserFile)
         {
-            // SAOrderedSensitive is treated differently because we need dynamic ports to
+            // SAOrderSensitive is treated differently because we need dynamic ports to
             // show the number of connections
-            isSAOrderedSensitive = nasbParserFile.className.Equals("SAOrderedSensitive");
+            isSAOrderSensitive = nasbParserFile.className.Equals("SAOrderSensitive");
             isFSFrame = nasbParserFile.className.Equals("FSFrame");
 
             AddToFileContents($"public int SetData({nasbParserFile.className} data, MovesetGraph graph, string assetPath, UnityEngine.Vector2 nodeDepthXY)");
@@ -77,9 +77,9 @@ namespace NASB_Parser_To_xNode
                     }
                     else
                     {
-                        if (isSAOrderedSensitive && variableObj.name.Equals("Actions"))
+                        if (isSAOrderSensitive && variableObj.name.Equals("Actions"))
                         {
-                            AddToFileContents("listSize = data.Actions.Count;");
+                            AddToFileContents("listSize = data.Actions.Length;");
                         } else
                         {
                             AddToFileContents($"{variableObj.name} = data.{variableObj.name};");
@@ -104,7 +104,7 @@ namespace NASB_Parser_To_xNode
                                 AddToFileContents($"foreach ({variableObj.variableType} {variableObj.name}_item in data.{variableObj.name})");
                                 OpenBlock();
                                 {
-                                    if (isSAOrderedSensitive)
+                                    if (isSAOrderSensitive)
                                     {
                                         AddToFileContents("// Create dynamic ports based on number of actions");
                                         AddToFileContents("string portName = \"\" + (DynamicPorts.Count() + 1);");
@@ -174,7 +174,7 @@ namespace NASB_Parser_To_xNode
                 nodeName = $"{key}_{nodeName}";
                 AddToFileContents($"{value}Node {nodeName} = graph.AddNode<{value}Node>();");
 
-                if (isSAOrderedSensitive)
+                if (isSAOrderSensitive)
                 {
                     // Connect dynamic port to new node
                     AddToFileContents($"GetPort(portName).Connect({nodeName}.GetPort(\"NodeInput\"));");
