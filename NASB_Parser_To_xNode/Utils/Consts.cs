@@ -36,7 +36,17 @@ namespace NASB_Parser_To_xNode
             new NASBParserFolder("Unity", "Unity")
         };
 
-        public static List<string> looseFiles = new List<string>{ "AgentState", "IdState", "TimedAction", "Moveset" };
+        public static List<string> looseFiles = new List<string>{ 
+            "AgentState", 
+            "IdState", 
+            "TimedAction", 
+            "Moveset"
+        };
+
+        public static List<string> specialFiles = new List<string>
+        {
+            "FloatSource"
+        };
 
         public static List<string> enumOnlyFiles = new List<string> {
             "GIEV",

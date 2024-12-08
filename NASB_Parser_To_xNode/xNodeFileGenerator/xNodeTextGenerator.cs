@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Linq;
+using System.Reflection.Metadata.Ecma335;
 
 namespace NASB_Parser_To_xNode
 {
@@ -150,12 +151,17 @@ namespace NASB_Parser_To_xNode
             OpenBlock();
             {
                 // IdState has no input, so skip it
-                if (!nasbParserFile.className.Equals("IdState"))
+                // FloatSource is a weird case because of the FloatSourceContainer we would end up with multiple NodeInput
+                if (
+                    !nasbParserFile.className.Equals("IdState")
+                    && !(nasbParserFile.parentClass != null && nasbParserFile.parentClass.Equals("FloatSource"))
+                )
                 {
                     string inputStartText = "[Input(connectionType = ConnectionType.Override)] public ";
                     if (nasbParserFile.parentClass == null || nasbParserFile.parentClass.Equals("IBulkSerializer"))
                     {
-                        if (Consts.looseFiles.Contains(nasbParserFile.className))
+                        if (Consts.looseFiles.Contains(nasbParserFile.className)
+                            || Consts.specialFiles.Contains(nasbParserFile.className))
                         {
                             AddToFileContents($"{inputStartText}{nasbParserFile.className} NodeInput;");
                         }
