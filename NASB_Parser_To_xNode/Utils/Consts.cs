@@ -38,7 +38,22 @@ namespace NASB_Parser_To_xNode
 
         public static List<string> looseFiles = new List<string>{ "AgentState", "IdState", "TimedAction", "Moveset" };
 
-        public static List<string> enumOnlyFiles = new List<string> { "GIEV", "HurtType", "Ease" };
+        public static List<string> enumOnlyFiles = new List<string> {
+            "GIEV",
+            "HurtType",
+            "Ease",
+            "StageLayer",
+            "WrapMode",
+            "InputType",
+            "LagType",
+            "ManipLag",
+            "SpeedType",
+            "Search",
+            "Stick",
+            "LocalFXAction",
+            "Manage",
+            "Phase"
+            };
 
         public static List<string> classesToIgnore = new List<string> { "ByteUtility" };
 
