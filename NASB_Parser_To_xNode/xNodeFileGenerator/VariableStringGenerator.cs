@@ -70,8 +70,9 @@ namespace NASB_Parser_To_xNode
             {
                 variableObj.isOutput = true;
                 string outputAttributeText = "Output";
-                
-                if (variableObj.isList)
+
+
+                if (variableObj.isList || variableObj.isArray)
                     outputAttributeText += "(connectionType = ConnectionType.Multiple)";
                 else
                     outputAttributeText += "(connectionType = ConnectionType.Override)";
@@ -84,7 +85,14 @@ namespace NASB_Parser_To_xNode
 
         public static string GetFullType(VariableObj variableObj)
         {
-            return (variableObj.isList ? $"List<{variableObj.variableType}>" : variableObj.variableType);
+            if (variableObj.isList)
+            {
+                return $"List<{variableObj.variableType}>";
+            } else if (variableObj.isArray)
+            {
+                return $"{variableObj.variableType}[]";
+            }
+            return variableObj.variableType;
         }
 
         public static bool FindClassIncludingNested(string className)

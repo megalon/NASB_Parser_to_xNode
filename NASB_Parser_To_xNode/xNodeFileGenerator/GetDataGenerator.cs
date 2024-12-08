@@ -45,9 +45,10 @@ namespace NASB_Parser_To_xNode
                     AddToFileContents($"{mainClassName}.Value = Value;");
                 }
 
+                bool firstArrayVariable = true;
+
                 foreach (VariableObj variableObj in nasbParserFile.variables)
                 {
-
                     var typeClassFileName = variableObj.variableType;
                     if (variableObj.variableType.Contains("."))
                     {
@@ -68,29 +69,43 @@ namespace NASB_Parser_To_xNode
                     else if (variableObj.variableType.Equals("FloatSource")) idsArray = Consts.floatSourceTypeIds;
                     else if (variableObj.variableType.Equals("ObjectSource")) idsArray = Consts.objectSourceTypeIds;
 
-                    if (variableObj.isList)
+                    if (variableObj.isList || variableObj.isArray)
                     {
+                        if (variableObj.isArray)
+                        {
+                            AddToFileContents($"{mainClassName}.{variableObj.name} = new {variableObj.variableType}[GetPort(\"{variableObj.name}\").ConnectionCount];");
+                            AddToFileContents($"{(firstArrayVariable ? "int " : "")}i = 0;");
+                            firstArrayVariable = false;
+                        }
+
                         if (isSAOrderedSensitive)
                         {
                             AddToFileContents($"foreach(NodePort port in DynamicOutputs)");
                             OpenBlock();
-                                AddToFileContents("if (port.ConnectionCount <= 0) continue;");
-                                AddToFileContents($"{typeClassFileName}Node {nodeName} = ({typeClassFileName}Node)port.Connection.node;");
+                            AddToFileContents("if (port.ConnectionCount <= 0) continue;");
+                            AddToFileContents($"{typeClassFileName}Node {nodeName} = ({typeClassFileName}Node)port.Connection.node;");
                         } else
                         {
                             AddToFileContents($"foreach(NodePort port in GetPort(\"{variableObj.name}\").GetConnections())");
                             OpenBlock();
-                                AddToFileContents($"{typeClassFileName}Node {nodeName} = ({typeClassFileName}Node)port.node;");
+                            AddToFileContents($"{typeClassFileName}Node {nodeName} = ({typeClassFileName}Node)port.node;");
                         }
-                        GenerateSwitchStatement(nodeName, variableObj, idsArray, mainClassName, typeClassFileName, true);
+                        GenerateSwitchStatement(nodeName, variableObj, idsArray, mainClassName, typeClassFileName);
+                        
+                        if (variableObj.isArray)
+                        {
+                            AddToFileContents("++i;");
+                        }
+
                         CloseBlock();
-                    } else
+                    }
+                    else
                     {
                         AddToFileContents($"if (GetPort(\"{variableObj.name}\").ConnectionCount > 0)");
                         OpenBlock();
                         {
                             AddToFileContents($"{typeClassFileName}Node {nodeName} = ({typeClassFileName}Node)GetPort(\"{variableObj.name}\").GetConnection(0).node;");
-                            GenerateSwitchStatement(nodeName, variableObj, idsArray, mainClassName, typeClassFileName, false);
+                            GenerateSwitchStatement(nodeName, variableObj, idsArray, mainClassName, typeClassFileName);
                         }
                         CloseBlock();
                     }
@@ -100,7 +115,7 @@ namespace NASB_Parser_To_xNode
             CloseBlock();
         }
 
-        private static void GenerateSwitchStatement(string nodeName, VariableObj variableObj, string[] idsArray, string mainClassName, string typeClassFileName, bool isList)
+        private static void GenerateSwitchStatement(string nodeName, VariableObj variableObj, string[] idsArray, string mainClassName, string typeClassFileName)
         {
             if (idsArray != null)
             {
@@ -111,17 +126,27 @@ namespace NASB_Parser_To_xNode
                     AddToFileContents($"case {variableObj.variableType}.TypeId.{id}:");
                     UpdateIndent(1);
                     {
-                        if (isList)
+                        if (variableObj.isList || variableObj.isArray)
                         {
                             if (isSAOrderedSensitive)
                             {
                                 AddToFileContents($"{id}Node {id}_{nodeName} = ({id}Node)port.Connection.node;");
-                            } else
+                            }
+                            else
                             {
                                 AddToFileContents($"{id}Node {id}_{nodeName} = ({id}Node)port.node;");
                             }
-                            AddToFileContents($"{mainClassName}.{variableObj.name}.Add({id}_{nodeName}.GetData());");
-                        } else
+
+                            if (variableObj.isList)
+                            {
+                                AddToFileContents($"{mainClassName}.{variableObj.name}.Add({id}_{nodeName}.GetData());");
+                            }
+                            else
+                            {
+                                AddToFileContents($"{mainClassName}.{variableObj.name}[i] = {id}_{nodeName}.GetData();");
+                            }
+                        }
+                        else
                         {
                             AddToFileContents($"{id}Node {id}_{nodeName} = ({id}Node)GetPort(\"{variableObj.name}\").GetConnection(0).node;");
                             AddToFileContents($"{mainClassName}.{variableObj.name} = {id}_{nodeName}.GetData();");
@@ -134,9 +159,13 @@ namespace NASB_Parser_To_xNode
             }
             else
             {
-                if (isList)
+                if (variableObj.isList)
                 {
                     AddToFileContents($"{mainClassName}.{variableObj.name}.Add({nodeName}.GetData());");
+                }
+                else if (variableObj.isArray)
+                {
+                    AddToFileContents($"{mainClassName}.{variableObj.name}[i] = {nodeName}.GetData();");
                 }
                 else
                 {

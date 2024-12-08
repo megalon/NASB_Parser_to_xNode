@@ -45,14 +45,20 @@ namespace NASB_Parser_To_xNode
                         NASBParserFile nestedClass = nasbParserFile.nestedClasses.Find(x => x.className.Equals(mainType));
 
                         var typeToCreate = variableObj.variableType;
+                        
                         if (variableObj.isList)
                         {
                             typeToCreate = "List<" + typeToCreate + ">";
                         }
+                        else if (variableObj.isArray)
+                        {
+                            typeToCreate = typeToCreate + "[]";
+                        }
+
                         AddToFileContents($"{variableObj.name} = data.{variableObj.name};");
                         AddToFileContents($"");
 
-                        if (variableObj.isList)
+                        if (variableObj.isList || variableObj.isArray)
                         {
                             // Create the list of nodes for this variable type and add them to the graph
                             AddToFileContents($"foreach ({variableObj.variableType} {variableObj.name}_item in {variableObj.name})");
@@ -92,7 +98,7 @@ namespace NASB_Parser_To_xNode
                             else if (variableObj.variableType.Equals("FloatSource")) idsArray = Consts.floatSourceTypeIds;
                             else if (variableObj.variableType.Equals("ObjectSource")) idsArray = Consts.objectSourceTypeIds;
                             
-                            if (variableObj.isList)
+                            if (variableObj.isList || variableObj.isArray)
                             {
                                 // Create the list of nodes for this variable type and add them to the graph
                                 AddToFileContents($"foreach ({variableObj.variableType} {variableObj.name}_item in data.{variableObj.name})");

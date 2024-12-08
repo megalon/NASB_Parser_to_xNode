@@ -32,6 +32,7 @@ namespace NASB_Parser_To_xNode
     {
         public string variableType;
         public bool isList;
+        public bool isArray;
         public bool isStatic;
         public bool isReadonly;
         public bool isOutput;
