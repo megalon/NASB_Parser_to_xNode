@@ -62,7 +62,12 @@ namespace NASB_Parser_To_xNode
             "Stick",
             "LocalFXAction",
             "Manage",
-            "Phase"
+            "Phase",
+            "CtrlSeg",
+            "FloatCompare",
+            "ButtonCompare",
+            "CtrlSegCompare",
+            "MultiCompare"
             };
 
         public static List<string> classesToIgnore = new List<string> { "ByteUtility" };
