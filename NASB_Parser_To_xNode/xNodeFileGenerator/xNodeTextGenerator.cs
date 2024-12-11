@@ -210,10 +210,12 @@ namespace NASB_Parser_To_xNode
                         if (Utils.HasTypeID(nasbParserFile.className))
                             AddToFileContents($"TID = TypeId.{nasbParserFile.className};");
 
+                        // Special default values for InputValidator
                         if (nasbParserFile.className.Equals("InputValidator"))
                         {
-                            AddToFileContents("// InputValidator should default to Inside, since zero is unused");
-                            AddToFileContents($"SegCompare = CtrlSegCompare.Inside;");
+                            AddToFileContents($"ButtonCompare = ButtonCompare.Down;");
+                            AddToFileContents($"SegmentCompare = CtrlSegCompare.Inside;");
+                            AddToFileContents($"MultiCompare = MultiCompare.Any;");
                         }
                     }
                     CloseBlock();
