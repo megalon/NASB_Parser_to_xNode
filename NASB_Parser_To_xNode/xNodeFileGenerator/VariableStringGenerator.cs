@@ -13,9 +13,8 @@ namespace NASB_Parser_To_xNode
             var accString = "public";
             string relativeNamespace = "";
 
-            // Special case for TID and Version 
-            if ((variableObj.name.Equals("TID") && variableObj.variableType.Equals("TypeId"))
-                || (variableObj.name.Equals("Version") && variableObj.variableType.Equals("int")))
+            // Special case for TID
+            if (variableObj.name.Equals("TID") && variableObj.variableType.Equals("TypeId"))
             {
                 accString = "[HideInInspector] public";
 
@@ -26,7 +25,7 @@ namespace NASB_Parser_To_xNode
             var startOfLine = $"{accString} {(variableObj.isStatic ? "static " : "")}{(variableObj.isReadonly ? "readonly " : "")}";
 
             // Handle Vector3 ambiguity
-            if (variableObj.variableType.Equals("Vector3")) variableObj.variableType = "NASB_Parser.Vector3";
+            if (variableObj.variableType.Equals("Vector3")) variableObj.variableType = "MovesetParser.Unity.Vector3";
 
             // Handle HBM ambiguity
             if (nasbParserFile.className.EndsWith("_HBM"))
@@ -71,8 +70,9 @@ namespace NASB_Parser_To_xNode
             {
                 variableObj.isOutput = true;
                 string outputAttributeText = "Output";
-                
-                if (variableObj.isList)
+
+
+                if (variableObj.isList || variableObj.isArray)
                     outputAttributeText += "(connectionType = ConnectionType.Multiple)";
                 else
                     outputAttributeText += "(connectionType = ConnectionType.Override)";
@@ -85,7 +85,14 @@ namespace NASB_Parser_To_xNode
 
         public static string GetFullType(VariableObj variableObj)
         {
-            return (variableObj.isList ? $"List<{variableObj.variableType}>" : variableObj.variableType);
+            if (variableObj.isList)
+            {
+                return $"List<{variableObj.variableType}>";
+            } else if (variableObj.isArray)
+            {
+                return $"{variableObj.variableType}[]";
+            }
+            return variableObj.variableType;
         }
 
         public static bool FindClassIncludingNested(string className)

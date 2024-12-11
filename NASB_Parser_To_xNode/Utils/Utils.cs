@@ -11,10 +11,10 @@ namespace NASB_Parser_To_xNode
         public static void RecurseThroughParentNamespaces(NASBParserFile nasbParserFile)
         {
             if (nasbParserFile.parentClass == null || nasbParserFile.parentClass.Equals(string.Empty)) return;
-            if (nasbParserFile.parentClass.Equals("ISerializable")) return;
+            if (nasbParserFile.parentClass.Equals("IBulkSerializer")) return;
             if (Path.GetDirectoryName(nasbParserFile.relativePath).Equals(string.Empty)) return;
 
-            xNodeTextGenerator.AddToFileContents($"using static NASB_Parser.{Path.GetDirectoryName(nasbParserFile.relativePath)}.{nasbParserFile.parentClass};");
+            xNodeTextGenerator.AddToFileContents($"using static MovesetParser.{Path.GetDirectoryName(nasbParserFile.relativePath)}.{nasbParserFile.parentClass};");
             if (Program.nasbParserFiles.Any(x => x.className.Equals(nasbParserFile.parentClass)))
             {
                 RecurseThroughParentNamespaces(Program.nasbParserFiles.Find(x => x.className.Equals(nasbParserFile.parentClass)));
@@ -23,7 +23,7 @@ namespace NASB_Parser_To_xNode
 
         public static string GetRelativeNamespace(NASBParserFile nasbParserFile)
         {
-            return $"NASB_Parser.{Path.GetDirectoryName(nasbParserFile.relativePath)}.{nasbParserFile.className}";
+            return $"MovesetParser.{Path.GetDirectoryName(nasbParserFile.relativePath)}.{nasbParserFile.className}";
         }
 
         public static string GetStringBetweenStrings(string line, string start, string end)
@@ -78,6 +78,21 @@ namespace NASB_Parser_To_xNode
                     return "private";
             }
             throw new Exception("Invalid AccessabilityLevel!");
+        }
+
+        public static bool HasTypeID(string typeName)
+        {
+            if (Consts.checkThingTypeIds.Contains(typeName))
+                return true;
+            if (Consts.floatSourceTypeIds.Contains(typeName))
+                return true;
+            if (Consts.jumpTypeIds.Contains(typeName))
+                return true;
+            if (Consts.objectSourceTypeIds.Contains(typeName))
+                return true;
+            if (Consts.stateActionTypeIds.Contains(typeName))
+                return true;
+            return false;
         }
     }
 }

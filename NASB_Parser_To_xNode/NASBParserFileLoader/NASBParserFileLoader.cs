@@ -38,7 +38,7 @@ namespace NASB_Parser_To_xNode
 
                     string line;
                     string className = Path.GetFileNameWithoutExtension(filePath);
-                    nasbParserFile.relativePath = filePath.Substring(mainPath.Length);
+                    nasbParserFile.relativePath = filePath.Substring(mainPath.Length + 1);
                     nasbParserFile.className = Path.GetFileNameWithoutExtension(nasbParserFile.relativePath);
 
                     mainFileReadingState = ReadingState.ReadingImportsAndNamespace;
@@ -112,6 +112,11 @@ namespace NASB_Parser_To_xNode
 
             if (line.Contains(":"))
             {
+                if (line.Contains(", IBulkSerializer"))
+                {
+                    line = line.Substring(0, line.IndexOf(", IBulkSerializer"));
+                }
+
                 nasbParserFile.parentClass = line.Substring(line.IndexOf(" : ") + " : ".Length);
             }
 
@@ -127,6 +132,12 @@ namespace NASB_Parser_To_xNode
             if (line.Contains(" static "))
             {
                 nasbParserFile.isStatic = true;
+                nameIndex++;
+            }
+
+            if (line.Contains(" partial "))
+            {
+                nasbParserFile.isPartial = true;
                 nameIndex++;
             }
 
@@ -219,7 +230,7 @@ namespace NASB_Parser_To_xNode
             VariableObj variableObj = new VariableObj();
             variableObj.accessability = Utils.GetAccessabilityLevel(line);
             if (line.IndexOf("List<") > -1 && line.IndexOf(">") > -1) variableObj.isList = true;
-
+            else if (line.IndexOf("[]") > -1) variableObj.isArray = true;
 
             line = line.Trim();
             // Remove the trailing ; if it exists
@@ -242,9 +253,11 @@ namespace NASB_Parser_To_xNode
             }
 
             var split = line.Split(" ");
-
+            
             if (variableObj.isList)
                 variableObj.variableType = Utils.GetStringBetweenStrings(split[nameIndex - 1], "List<", ">");
+            else if (variableObj.isArray)
+                variableObj.variableType = split[nameIndex - 1].Substring(0, split[nameIndex - 1].IndexOf("[]"));
             else
                 variableObj.variableType = split[nameIndex - 1];
 

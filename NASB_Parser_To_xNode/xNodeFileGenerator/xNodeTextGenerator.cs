@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Linq;
+using System.Reflection.Metadata.Ecma335;
 
 namespace NASB_Parser_To_xNode
 {
@@ -12,11 +13,11 @@ namespace NASB_Parser_To_xNode
         private static string indent;
         private static string fileContents;
 
-        private static string[] otherImports = { "UnityEngine", "UnityEditor", "XNode", "XNodeEditor", "NASB_Parser" };
+        private static string[] otherImports = { "UnityEngine", "UnityEditor", "XNode", "XNodeEditor", "MovesetParser" };
         private static Dictionary<string, string> specialImports = new Dictionary<string, string> {
-            { "SAManipHitbox", "static NASB_Parser.StateActions.SAManipHitbox" },
-            { "SAManipHurtbox", "static NASB_Parser.StateActions.SAManipHurtbox" },
-            { "SAOrderedSensitive", "System.Linq" }
+            { "SAManipHitbox", "static MovesetParser.StateActions.SAManipHitbox" },
+            { "SAManipHurtbox", "static MovesetParser.StateActions.SAManipHurtbox" },
+            { "SAOrderSensitive", "System.Linq" }
         };
         private static Dictionary<string, string> specialTypes = new Dictionary<string, string>
         {
@@ -52,7 +53,7 @@ namespace NASB_Parser_To_xNode
 
             foreach (NASBParserFolder folder in Consts.folders)
             {
-                var extraParserImport = "NASB_Parser." + folder.folderName;
+                var extraParserImport = "MovesetParser." + folder.folderName;
                 if (!nasbParserFile.imports.Contains(extraParserImport))
                     AddToFileContents("using " + extraParserImport + ";");
             }
@@ -66,7 +67,7 @@ namespace NASB_Parser_To_xNode
                 && !nasbParserFile.parentClass.Equals(string.Empty)
                 && !Path.GetDirectoryName(nasbParserFile.relativePath).Equals(string.Empty))
             {
-                if (nasbParserFile.parentClass.Equals("ISerializable"))
+                if (nasbParserFile.parentClass.Equals("IBulkSerializer"))
                 {
                     if (!isNested) AddToFileContents($"using static {Utils.GetRelativeNamespace(nasbParserFile)};");
                 } else 
@@ -79,9 +80,9 @@ namespace NASB_Parser_To_xNode
 
             string namespaceSubfolder = "";
 
-            if (nasbParserFile.@namespace != null && nasbParserFile.@namespace.Contains("NASB_Parser."))
+            if (nasbParserFile.@namespace != null && nasbParserFile.@namespace.Contains("MovesetParser."))
             {
-                namespaceSubfolder = nasbParserFile.@namespace.Substring("NASB_Parser.".Length);
+                namespaceSubfolder = nasbParserFile.@namespace.Substring("MovesetParser.".Length);
             }
 
             AddToFileContents("namespace NASB_Moveset_Editor" + (namespaceSubfolder.Equals(string.Empty) ? "" : "." + namespaceSubfolder));
@@ -97,7 +98,7 @@ namespace NASB_Parser_To_xNode
 
         private static void HandleClass(NASBParserFile nasbParserFile, bool isNested)
         {
-            bool isSAOrderedSensitive = nasbParserFile.className.Equals("SAOrderedSensitive");
+            bool isSAOrderSensitive = nasbParserFile.className.Equals("SAOrderSensitive");
 
             // Fix variables with type namespace of nested class
             foreach (VariableObj variable in nasbParserFile.variables)
@@ -119,8 +120,9 @@ namespace NASB_Parser_To_xNode
                 nasbParserFile.className = nasbParserFile.relativePath.Replace(".", "_");
                 nasbParserFile.className = nasbParserFile.className.Substring(nasbParserFile.className.LastIndexOf("\\") + 1);
             } else if (
-                nasbParserFile.relativePath.Contains("\\") 
-                && nasbParserFile.parentClass.Equals("ISerializable")
+                nasbParserFile.relativePath.Contains("\\")
+                && nasbParserFile.parentClass != null
+                && nasbParserFile.parentClass.Equals("IBulkSerializer")
                 && !Consts.classesToNamespaces.ContainsKey(nasbParserFile.className))
             {
                 // Set parent class for loose files in folders
@@ -133,7 +135,10 @@ namespace NASB_Parser_To_xNode
             {
                 // IdState doesn't need the "[Input]" that BaseMovesetNode has, so just inherit from default Node
                 classDeclaration += $"Node : Node";
-            } else if (nasbParserFile.parentClass == null || nasbParserFile.parentClass.Equals("ISerializable"))
+            } else if (nasbParserFile.parentClass == null
+                || nasbParserFile.parentClass.Equals("IBulkSerializer")
+                || nasbParserFile.parentClass.Equals("Misc")
+                )
             {
                 classDeclaration += $"Node : BaseMovesetNode";
             } else
@@ -146,12 +151,17 @@ namespace NASB_Parser_To_xNode
             OpenBlock();
             {
                 // IdState has no input, so skip it
-                if (!nasbParserFile.className.Equals("IdState"))
+                // FloatSource is a weird case because of the FloatSourceContainer we would end up with multiple NodeInput
+                if (
+                    !nasbParserFile.className.Equals("IdState")
+                    && !(nasbParserFile.parentClass != null && nasbParserFile.parentClass.Equals("FloatSource"))
+                )
                 {
                     string inputStartText = "[Input(connectionType = ConnectionType.Override)] public ";
-                    if (nasbParserFile.parentClass == null || nasbParserFile.parentClass.Equals("ISerializable"))
+                    if (nasbParserFile.parentClass == null || nasbParserFile.parentClass.Equals("IBulkSerializer"))
                     {
-                        if (Consts.looseFiles.Contains(nasbParserFile.className))
+                        if (Consts.looseFiles.Contains(nasbParserFile.className)
+                            || Consts.specialFiles.Contains(nasbParserFile.className))
                         {
                             AddToFileContents($"{inputStartText}{nasbParserFile.className} NodeInput;");
                         }
@@ -176,8 +186,8 @@ namespace NASB_Parser_To_xNode
                 // Variables
                 foreach (VariableObj variableObj in nasbParserFile.variables)
                 {
-                    // Skip the "Actions" variable for SAOrderedSensitive
-                    if (isSAOrderedSensitive && variableObj.name.Equals("Actions"))
+                    // Skip the "Actions" variable for SAOrderSensitive
+                    if (isSAOrderSensitive && variableObj.name.Equals("Actions"))
                     {
                         // Add the listSize variable, and set it to an output
                         variableObj.isOutput = true;
@@ -196,15 +206,16 @@ namespace NASB_Parser_To_xNode
                     OpenBlock();
                     {
                         AddToFileContents("base.Init();");
-                        if (Consts.classToTypeId.ContainsKey(nasbParserFile.className))
-                            AddToFileContents($"TID = TypeId.{Consts.classToTypeId[nasbParserFile.className]};");
-                        if (Consts.specialClassVersions.ContainsKey(nasbParserFile.className))
-                            AddToFileContents($"Version = {Consts.specialClassVersions[nasbParserFile.className]};");
 
+                        if (Utils.HasTypeID(nasbParserFile.className))
+                            AddToFileContents($"TID = TypeId.{nasbParserFile.className};");
+
+                        // Special default values for InputValidator
                         if (nasbParserFile.className.Equals("InputValidator"))
                         {
-                            AddToFileContents("// InputValidator should default to Inside, since zero is unused");
-                            AddToFileContents($"SegCompare = CtrlSegCompare.Inside;");
+                            AddToFileContents($"ButtonCompare = ButtonCompare.Down;");
+                            AddToFileContents($"SegmentCompare = CtrlSegCompare.Inside;");
+                            AddToFileContents($"MultiCompare = MultiCompare.Any;");
                         }
                     }
                     CloseBlock();
